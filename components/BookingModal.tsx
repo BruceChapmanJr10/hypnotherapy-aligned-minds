@@ -5,8 +5,16 @@ import Calendar from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 
 import { db } from "../lib/firebase";
-import { doc, getDoc } from "firebase/firestore";
-import { collection, addDoc, Timestamp } from "firebase/firestore";
+import {
+  doc,
+  getDoc,
+  collection,
+  addDoc,
+  Timestamp,
+  query,
+  where,
+  getDocs,
+} from "firebase/firestore";
 
 interface Props {
   isOpen: boolean;
@@ -17,6 +25,7 @@ export default function BookingModal({ isOpen, onClose }: Props) {
   const [availability, setAvailability] = useState<any>({});
   const [date, setDate] = useState<Date | null>(new Date());
   const [time, setTime] = useState<string | null>(null);
+  const [bookedSlots, setBookedSlots] = useState<string[]>([]);
 
   const [form, setForm] = useState({
     name: "",
@@ -37,7 +46,28 @@ export default function BookingModal({ isOpen, onClose }: Props) {
     fetchAvailability();
   }, []);
 
-  // 🔹 Convert date → day name
+  useEffect(() => {
+    if (!date) return;
+
+    const fetchBookings = async () => {
+      const formattedDate = date.toISOString().split("T")[0];
+
+      const q = query(
+        collection(db, "bookings"),
+        where("date", "==", formattedDate),
+      );
+
+      const snapshot = await getDocs(q);
+
+      const booked = snapshot.docs.map((doc) => doc.data().time);
+
+      setBookedSlots(booked);
+    };
+
+    fetchBookings();
+  }, [date]);
+
+  // Convert date → day name
   const getDayName = (date: Date) => {
     return date.toLocaleDateString("en-US", { weekday: "long" }).toLowerCase();
   };
@@ -45,7 +75,9 @@ export default function BookingModal({ isOpen, onClose }: Props) {
   if (!isOpen) return null;
 
   const dayName = date ? getDayName(date) : "";
-  const timeSlots: string[] = availability[dayName] || [];
+  const allSlots: string[] = availability[dayName] || [];
+
+  const timeSlots = allSlots.filter((slot) => !bookedSlots.includes(slot));
 
   const handleBooking = async () => {
     if (!date || !time) {
@@ -86,7 +118,7 @@ export default function BookingModal({ isOpen, onClose }: Props) {
         {/* CLOSE */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-gray-500"
+          className="sticky top-0 ml-auto block text-gray-500 text-xl font-bold"
         >
           ✕
         </button>
@@ -95,14 +127,14 @@ export default function BookingModal({ isOpen, onClose }: Props) {
           Book Appointment
         </h2>
 
-        {/* 📅 CALENDAR */}
+        {/*  CALENDAR */}
         <Calendar
           onChange={(value) => setDate(value as Date)}
           value={date}
           className="mx-auto border rounded-lg p-2"
         />
 
-        {/* 🕒 TIME SLOTS */}
+        {/*  TIME SLOTS */}
         <div className="mt-6">
           <h3 className="font-semibold text-gray-800 mb-2">Select Time</h3>
 
@@ -111,23 +143,29 @@ export default function BookingModal({ isOpen, onClose }: Props) {
               No availability for this day.
             </p>
           )}
-
           <div className="grid grid-cols-3 gap-2">
-            {timeSlots.map((slot: string) => (
-              <button
-                key={slot}
-                onClick={() => setTime(slot)}
-                className={`p-2 rounded-lg border text-sm font-medium transition
+            {allSlots.map((slot: string) => {
+              const isBooked = bookedSlots.includes(slot);
 
-                ${
-                  time === slot
-                    ? "bg-blue-600 text-white border-blue-600"
-                    : "bg-gray-100 text-gray-900 border-gray-300 hover:bg-blue-50"
-                }`}
-              >
-                {slot}
-              </button>
-            ))}
+              return (
+                <button
+                  key={slot}
+                  disabled={isBooked}
+                  onClick={() => setTime(slot)}
+                  className={`p-2 rounded-lg border text-sm font-medium transition
+
+        ${
+          isBooked
+            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
+            : time === slot
+              ? "bg-blue-600 text-white border-blue-600"
+              : "bg-gray-100 text-gray-900 border-gray-300 hover:bg-blue-50"
+        }`}
+                >
+                  {slot}
+                </button>
+              );
+            })}
           </div>
         </div>
 
