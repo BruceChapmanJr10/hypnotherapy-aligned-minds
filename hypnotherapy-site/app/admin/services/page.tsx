@@ -138,6 +138,16 @@ export default function AdminServicesPage() {
           className="border p-3"
         />
 
+        {form.image && (
+          <div className="relative w-48 h-32 mt-2">
+            <img
+              src={form.image}
+              alt="Preview"
+              className="object-cover rounded border"
+            />
+          </div>
+        )}
+
         <button className="bg-blue-600 text-white p-3 rounded">
           {editingId ? "Update Service" : "Add Service"}
         </button>

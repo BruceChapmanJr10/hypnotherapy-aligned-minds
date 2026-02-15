@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 
 interface Props {
   title: string;
@@ -9,9 +10,24 @@ interface Props {
 
 export default function HeroSection({ title, heroImage }: Props) {
   return (
-    <section className="py-20 px-6 text-center">
+    <section className="py-20 bg-gray-300 px-6 text-center">
       {/* TITLE */}
-      <h1 className="text-5xl font-bold mb-10 text-gray-900">{title}</h1>
+      <h1 className="text-5xl font-bold mb-6 text-gray-900">{title}</h1>
+
+      {/* CTA BUTTONS */}
+      <div className="flex justify-center gap-6 mb-10">
+        <Link href="/booking">
+          <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition">
+            Book Appointment
+          </button>
+        </Link>
+
+        <Link href="/contact">
+          <button className="border border-gray-400 text-blue-700 hover:bg-gray-200 px-8 py-3 rounded-lg font-semibold transition">
+            Contact Us
+          </button>
+        </Link>
+      </div>
 
       {/* HERO IMAGE */}
       {heroImage && (

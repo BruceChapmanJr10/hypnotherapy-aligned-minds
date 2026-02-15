@@ -20,11 +20,15 @@ export default function ServiceModal({ service, onClose }: Props) {
           ✕
         </button>
 
-        <h2 className="text-2xl font-bold mb-4">{service.title}</h2>
+        <h2 className="text-2xl text-gray-800 font-bold mb-4">
+          {service.title}
+        </h2>
 
-        <p className="mb-4 text-gray-700">{service.description}</p>
+        <p className="mb-4 text-gray-800">{service.description}</p>
 
-        <p className="font-semibold text-lg">Price: {service.price}</p>
+        <p className="font-semibold text-gray-800 text-lg">
+          Price: {service.price}
+        </p>
       </div>
     </div>
   );
