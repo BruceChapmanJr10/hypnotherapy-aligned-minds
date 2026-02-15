@@ -2,6 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useState } from "react";
+import BookingModal from "./BookingModal";
 
 interface Props {
   title: string;
@@ -9,6 +11,8 @@ interface Props {
 }
 
 export default function HeroSection({ title, heroImage }: Props) {
+  const [openBooking, setOpenBooking] = useState(false);
+
   return (
     <section className="py-20 bg-gray-300 px-6 text-center">
       {/* TITLE */}
@@ -16,11 +20,12 @@ export default function HeroSection({ title, heroImage }: Props) {
 
       {/* CTA BUTTONS */}
       <div className="flex justify-center gap-6 mb-10">
-        <Link href="/booking">
-          <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition">
-            Book Appointment
-          </button>
-        </Link>
+        <button
+          onClick={() => setOpenBooking(true)}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition"
+        >
+          Book Appointment
+        </button>
 
         <Link href="/contact">
           <button className="border border-gray-400 text-blue-700 hover:bg-gray-200 px-8 py-3 rounded-lg font-semibold transition">
@@ -43,6 +48,11 @@ export default function HeroSection({ title, heroImage }: Props) {
           </div>
         </div>
       )}
+
+      <BookingModal
+        isOpen={openBooking}
+        onClose={() => setOpenBooking(false)}
+      />
     </section>
   );
 }

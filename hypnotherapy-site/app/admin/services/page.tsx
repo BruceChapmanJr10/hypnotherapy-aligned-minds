@@ -63,11 +63,17 @@ export default function AdminServicesPage() {
     e.preventDefault();
 
     if (editingId) {
-      await updateDoc(doc(db, "services", editingId), form);
+      const { id, ...serviceData } = form;
+
+      await updateDoc(doc(db, "services", editingId), serviceData);
+
       alert("Service updated!");
       setEditingId(null);
     } else {
-      await addDoc(collection(db, "services"), form);
+      const { id, ...serviceData } = form;
+
+      await addDoc(collection(db, "services"), serviceData);
+
       alert("Service added!");
     }
 
