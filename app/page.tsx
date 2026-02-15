@@ -8,6 +8,7 @@ import Link from "next/link";
 import ServicesSection from "../components/ServicesSection";
 import AboutSection from "../components/AboutSection";
 import HeroSection from "@/components/HeroSection";
+import BlogPreview from "@/components/BlogPreview";
 
 interface HomepageContent {
   title: string;
@@ -43,6 +44,8 @@ export default function HomePage() {
       <AboutSection title={content.aboutTitle} text={content.aboutText} />
 
       <ServicesSection />
+
+      <BlogPreview />
     </main>
   );
 }

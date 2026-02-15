@@ -1,0 +1,84 @@
+"use client";
+
+import { useEffect, useState } from "react";
+import Link from "next/link";
+import { db } from "../lib/firebase";
+import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
+
+interface Post {
+  id: string;
+  title: string;
+  image: string;
+}
+
+export default function BlogPreview() {
+  const [posts, setPosts] = useState<Post[]>([]);
+
+  // 🔹 Fetch latest posts
+  useEffect(() => {
+    const fetchPosts = async () => {
+      const q = query(
+        collection(db, "blogPosts"),
+        orderBy("createdAt", "desc"),
+        limit(3),
+      );
+
+      const snapshot = await getDocs(q);
+
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...(doc.data() as Post),
+      }));
+
+      setPosts(data);
+    };
+
+    fetchPosts();
+  }, []);
+
+  return (
+    <section className="py-20 bg-gray-950 text-white px-6">
+      <div className="max-w-6xl mx-auto">
+        {/* TITLE */}
+        <h2 className="text-3xl font-bold mb-10 text-center">
+          Latest From The Blog
+        </h2>
+
+        {/* POSTS GRID */}
+        <div className="grid md:grid-cols-3 gap-8">
+          {posts.map((post) => (
+            <Link
+              key={post.id}
+              href={`/blog/${post.id}`}
+              className="bg-gray-900 rounded-xl overflow-hidden hover:shadow-lg transition"
+            >
+              {/* IMAGE */}
+              {post.image && (
+                <img
+                  src={post.image}
+                  alt={post.title}
+                  className="h-48 w-full object-cover"
+                />
+              )}
+
+              {/* CONTENT */}
+              <div className="p-4">
+                <h3 className="font-semibold text-lg">{post.title}</h3>
+              </div>
+            </Link>
+          ))}
+        </div>
+
+        {/* VIEW ALL BUTTON */}
+        <div className="text-center mt-10">
+          <Link
+            href="/blog"
+            className="bg-blue-600 px-6 py-3 rounded hover:bg-blue-700 transition"
+          >
+            View All Posts
+          </Link>
+        </div>
+      </div>
+    </section>
+  );
+}
