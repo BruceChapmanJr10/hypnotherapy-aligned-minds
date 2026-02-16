@@ -11,6 +11,8 @@ import {
   updateDoc,
 } from "firebase/firestore";
 
+import { CldUploadWidget } from "next-cloudinary";
+
 interface Service {
   id?: string;
   title: string;
@@ -55,6 +57,14 @@ export default function AdminServicesPage() {
     setForm({
       ...form,
       [e.target.name]: e.target.value,
+    });
+  };
+
+  // 🔹 Handle Image Upload
+  const handleImageUpload = (url: string) => {
+    setForm({
+      ...form,
+      image: url,
     });
   };
 
@@ -136,14 +146,25 @@ export default function AdminServicesPage() {
           required
         />
 
-        <input
-          name="image"
-          placeholder="Image URL or /public path"
-          value={form.image}
-          onChange={handleChange}
-          className="border p-3"
-        />
+        {/* 🔹 CLOUDINARY UPLOAD */}
+        <CldUploadWidget
+          uploadPreset="aligned_minds_unsigned"
+          onSuccess={(result: any) => {
+            handleImageUpload(result.info.secure_url);
+          }}
+        >
+          {({ open }) => (
+            <button
+              type="button"
+              onClick={() => open()}
+              className="bg-purple-600 text-white p-3 rounded"
+            >
+              Upload Service Image
+            </button>
+          )}
+        </CldUploadWidget>
 
+        {/* 🔹 IMAGE PREVIEW */}
         {form.image && (
           <div className="relative w-48 h-32 mt-2">
             <img

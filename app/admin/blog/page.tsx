@@ -11,6 +11,8 @@ import {
   Timestamp,
 } from "firebase/firestore";
 
+import { CldUploadWidget } from "next-cloudinary";
+
 interface Post {
   id?: string;
   title: string;
@@ -44,13 +46,21 @@ export default function AdminBlogPage() {
     fetchPosts();
   }, []);
 
-  // 🔹 Handle input
+  // 🔹 Handle text input
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setForm({
       ...form,
       [e.target.name]: e.target.value,
+    });
+  };
+
+  // 🔹 Handle image upload
+  const handleImageUpload = (url: string) => {
+    setForm({
+      ...form,
+      image: url,
     });
   };
 
@@ -75,7 +85,6 @@ export default function AdminBlogPage() {
   // 🔹 Delete
   const handleDelete = async (id: string) => {
     await deleteDoc(doc(db, "blogPosts", id));
-
     fetchPosts();
   };
 
@@ -94,13 +103,32 @@ export default function AdminBlogPage() {
           required
         />
 
-        <input
-          name="image"
-          placeholder="Image URL"
-          value={form.image}
-          onChange={handleChange}
-          className="bg-gray-800 p-3 rounded"
-        />
+        {/* 🔹 CLOUDINARY UPLOAD */}
+        <CldUploadWidget
+          uploadPreset="aligned_minds_unsigned"
+          onSuccess={(result: any) => {
+            handleImageUpload(result.info.secure_url);
+          }}
+        >
+          {({ open }) => (
+            <button
+              type="button"
+              onClick={() => open()}
+              className="bg-purple-600 py-3 rounded"
+            >
+              Upload Blog Image
+            </button>
+          )}
+        </CldUploadWidget>
+
+        {/* 🔹 IMAGE PREVIEW */}
+        {form.image && (
+          <img
+            src={form.image}
+            alt="Preview"
+            className="w-64 h-40 object-cover rounded border"
+          />
+        )}
 
         <textarea
           name="content"
@@ -119,11 +147,18 @@ export default function AdminBlogPage() {
       <div className="grid gap-6">
         {posts.map((post) => (
           <div key={post.id} className="bg-gray-900 p-6 rounded-xl">
-            <h2 className="font-bold">{post.title}</h2>
+            <h2 className="font-bold text-lg">{post.title}</h2>
+
+            {post.image && (
+              <img
+                src={post.image}
+                className="w-64 h-40 object-cover rounded mt-3"
+              />
+            )}
 
             <button
               onClick={() => handleDelete(post.id!)}
-              className="bg-red-600 px-3 py-1 mt-3 rounded"
+              className="bg-red-600 px-3 py-1 mt-4 rounded"
             >
               Delete
             </button>

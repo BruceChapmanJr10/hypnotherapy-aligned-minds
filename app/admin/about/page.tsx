@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { db } from "../../../lib/firebase";
 import { doc, getDoc, setDoc } from "firebase/firestore";
+import { CldUploadWidget } from "next-cloudinary";
 
 export default function AdminAboutPage() {
   const [form, setForm] = useState({
@@ -29,13 +30,21 @@ export default function AdminAboutPage() {
     fetchData();
   }, []);
 
-  // 🔹 Handle input
+  // 🔹 Handle text input
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
     setForm({
       ...form,
       [e.target.name]: e.target.value,
+    });
+  };
+
+  // 🔹 Handle image upload
+  const handleImageUpload = (url: string) => {
+    setForm({
+      ...form,
+      image: url,
     });
   };
 
@@ -76,15 +85,34 @@ export default function AdminAboutPage() {
           className="border p-3 rounded"
         />
 
-        {/* IMAGE */}
-        <input
-          name="image"
-          placeholder="Image URL or /public path"
-          value={form.image}
-          onChange={handleChange}
-          className="border p-3 rounded"
-        />
+        {/* 🔹 CLOUDINARY UPLOAD */}
+        <CldUploadWidget
+          uploadPreset="aligned_minds_unsigned"
+          onSuccess={(result: any) => {
+            handleImageUpload(result.info.secure_url);
+          }}
+        >
+          {({ open }) => (
+            <button
+              type="button"
+              onClick={() => open()}
+              className="bg-purple-600 text-white py-3 rounded"
+            >
+              Upload About Image
+            </button>
+          )}
+        </CldUploadWidget>
 
+        {/* 🔹 IMAGE PREVIEW */}
+        {form.image && (
+          <img
+            src={form.image}
+            alt="About Preview"
+            className="w-full h-64 object-cover rounded"
+          />
+        )}
+
+        {/* SAVE */}
         <button
           onClick={handleSave}
           className="bg-blue-600 text-white py-3 rounded hover:bg-blue-700"
