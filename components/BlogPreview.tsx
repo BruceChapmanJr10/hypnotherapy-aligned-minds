@@ -37,10 +37,10 @@ export default function BlogPreview() {
   }, []);
 
   return (
-    <section className="py-20 bg-gray-950 text-white px-6">
+    <section className="py-24 bg-white px-6">
       <div className="max-w-6xl mx-auto">
         {/* TITLE */}
-        <h2 className="text-3xl font-bold mb-10 text-center">
+        <h2 className="text-3xl md:text-4xl font-bold mb-12 text-center text-blue-900">
           Latest From The Blog
         </h2>
 
@@ -50,7 +50,7 @@ export default function BlogPreview() {
             <Link
               key={post.id}
               href={`/blog/${post.id}`}
-              className="bg-gray-900 rounded-xl overflow-hidden hover:shadow-lg transition"
+              className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm hover:shadow-md transition"
             >
               {/* IMAGE */}
               {post.image && (
@@ -62,18 +62,20 @@ export default function BlogPreview() {
               )}
 
               {/* CONTENT */}
-              <div className="p-4">
-                <h3 className="font-semibold text-lg">{post.title}</h3>
+              <div className="p-5">
+                <h3 className="font-semibold text-lg text-gray-800">
+                  {post.title}
+                </h3>
               </div>
             </Link>
           ))}
         </div>
 
         {/* VIEW ALL BUTTON */}
-        <div className="text-center mt-10">
+        <div className="text-center mt-12">
           <Link
             href="/blog"
-            className="bg-blue-600 px-6 py-3 rounded hover:bg-blue-700 transition"
+            className="bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition"
           >
             View All Posts
           </Link>

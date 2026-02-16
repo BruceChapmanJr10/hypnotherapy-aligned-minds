@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import Image from "next/image";
 import { db } from "../../../lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 
@@ -27,12 +28,66 @@ export default function BlogPostPage() {
   if (!post) return null;
 
   return (
-    <main className="p-10 max-w-3xl mx-auto text-white">
-      <h1 className="text-4xl font-bold mb-6">{post.title}</h1>
+    <main
+      className="
+        min-h-screen
+        py-24
+        px-6
+        bg-gradient-to-b
+        from-blue-50
+        to-white
+      "
+    >
+      <article className="max-w-3xl mx-auto">
+        {/* TITLE */}
+        <h1
+          className="
+            text-4xl
+            md:text-5xl
+            font-bold
+            text-blue-900
+            mb-8
+            leading-tight
+          "
+        >
+          {post.title}
+        </h1>
 
-      {post.image && <img src={post.image} className="rounded mb-6" />}
+        {/* FEATURE IMAGE */}
+        {post.image && (
+          <div
+            className="
+              relative
+              w-full
+              h-[320px]
+              md:h-[420px]
+              mb-10
+              rounded-2xl
+              overflow-hidden
+              shadow-md
+            "
+          >
+            <Image
+              src={post.image}
+              alt={post.title}
+              fill
+              className="object-cover"
+            />
+          </div>
+        )}
 
-      <p className="leading-relaxed text-gray-300">{post.content}</p>
+        {/* CONTENT */}
+        <div
+          className="
+            text-gray-700
+            leading-relaxed
+            text-lg
+            space-y-6
+          "
+        >
+          {post.content}
+        </div>
+      </article>
     </main>
   );
 }

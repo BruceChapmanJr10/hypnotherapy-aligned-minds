@@ -23,8 +23,11 @@ interface Props {
 
 export default function BookingModal({ isOpen, onClose }: Props) {
   const [availability, setAvailability] = useState<any>({});
+
   const [date, setDate] = useState<Date | null>(new Date());
+
   const [time, setTime] = useState<string | null>(null);
+
   const [bookedSlots, setBookedSlots] = useState<string[]>([]);
 
   const [form, setForm] = useState({
@@ -32,10 +35,11 @@ export default function BookingModal({ isOpen, onClose }: Props) {
     email: "",
   });
 
-  // 🔹 Fetch availability from Firestore
+  // 🔹 Fetch availability
   useEffect(() => {
     const fetchAvailability = async () => {
       const ref = doc(db, "availability", "schedule");
+
       const snap = await getDoc(ref);
 
       if (snap.exists()) {
@@ -46,6 +50,7 @@ export default function BookingModal({ isOpen, onClose }: Props) {
     fetchAvailability();
   }, []);
 
+  // 🔹 Fetch booked slots
   useEffect(() => {
     if (!date) return;
 
@@ -67,17 +72,19 @@ export default function BookingModal({ isOpen, onClose }: Props) {
     fetchBookings();
   }, [date]);
 
-  // Convert date → day name
   const getDayName = (date: Date) => {
-    return date.toLocaleDateString("en-US", { weekday: "long" }).toLowerCase();
+    return date
+      .toLocaleDateString("en-US", {
+        weekday: "long",
+      })
+      .toLowerCase();
   };
 
   if (!isOpen) return null;
 
   const dayName = date ? getDayName(date) : "";
-  const allSlots: string[] = availability[dayName] || [];
 
-  const timeSlots = allSlots.filter((slot) => !bookedSlots.includes(slot));
+  const allSlots: string[] = availability[dayName] || [];
 
   const handleBooking = async () => {
     if (!date || !time) {
@@ -94,55 +101,95 @@ export default function BookingModal({ isOpen, onClose }: Props) {
       await addDoc(collection(db, "bookings"), {
         name: form.name,
         email: form.email,
-        date: date.toISOString().split("T")[0], // YYYY-MM-DD
+        date: date.toISOString().split("T")[0],
         time: time,
         createdAt: Timestamp.now(),
       });
 
       alert("Appointment booked successfully!");
 
-      // Reset form
       setTime(null);
-      setForm({ name: "", email: "" });
+      setForm({
+        name: "",
+        email: "",
+      });
 
       onClose();
     } catch (error) {
       console.error(error);
+
       alert("Error booking appointment.");
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
-      <div className="bg-white rounded-xl p-6 w-full max-w-md relative">
-        {/* CLOSE */}
+    <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      {/* MODAL CARD */}
+      <div
+        className="
+        relative
+        bg-white
+        rounded-2xl
+        shadow-xl
+        w-full
+        max-w-md
+        max-h-[90vh]
+        overflow-y-auto
+        p-8
+        border border-gray-200
+      "
+      >
+        {/* CLOSE BUTTON */}
         <button
           onClick={onClose}
-          className="sticky top-0 ml-auto block text-gray-500 text-xl font-bold"
+          className="
+            sticky top-0
+            ml-auto
+            w-9 h-9
+            flex items-center justify-center
+            rounded-full
+            bg-gray-100
+            text-gray-600
+            hover:bg-blue-100
+            hover:text-blue-700
+            transition
+            shadow-sm
+          "
         >
           ✕
         </button>
 
-        <h2 className="text-2xl font-bold mb-4 text-center">
+        {/* TITLE */}
+        <h2 className="text-2xl font-bold mb-6 text-center text-blue-900">
           Book Appointment
         </h2>
 
-        {/*  CALENDAR */}
+        {/* CALENDAR */}
         <Calendar
           onChange={(value) => setDate(value as Date)}
           value={date}
-          className="mx-auto border rounded-lg p-2"
+          className="
+            mx-auto
+            border
+            border-gray-200
+            rounded-xl
+            p-2
+            shadow-sm
+          "
         />
 
-        {/*  TIME SLOTS */}
-        <div className="mt-6">
-          <h3 className="font-semibold text-gray-800 mb-2">Select Time</h3>
+        {/* TIME SLOTS */}
+        <div className="mt-8">
+          <h3 className="font-semibold text-gray-800 mb-3 text-center">
+            Select Time
+          </h3>
 
-          {timeSlots.length === 0 && (
-            <p className="text-gray-500 text-sm">
+          {allSlots.length === 0 && (
+            <p className="text-gray-500 text-sm text-center">
               No availability for this day.
             </p>
           )}
+
           <div className="grid grid-cols-3 gap-2">
             {allSlots.map((slot: string) => {
               const isBooked = bookedSlots.includes(slot);
@@ -154,13 +201,13 @@ export default function BookingModal({ isOpen, onClose }: Props) {
                   onClick={() => setTime(slot)}
                   className={`p-2 rounded-lg border text-sm font-medium transition
 
-        ${
-          isBooked
-            ? "bg-gray-300 text-gray-500 cursor-not-allowed"
-            : time === slot
-              ? "bg-blue-600 text-white border-blue-600"
-              : "bg-gray-100 text-gray-900 border-gray-300 hover:bg-blue-50"
-        }`}
+                  ${
+                    isBooked
+                      ? "bg-gray-200 text-gray-400 cursor-not-allowed border-gray-200"
+                      : time === slot
+                        ? "bg-blue-600 text-white border-blue-600"
+                        : "bg-gray-50 text-gray-900 border-gray-200 hover:bg-blue-50"
+                  }`}
                 >
                   {slot}
                 </button>
@@ -169,34 +216,76 @@ export default function BookingModal({ isOpen, onClose }: Props) {
           </div>
         </div>
 
-        {/* 👤 FORM */}
-        <div className="mt-6 flex flex-col gap-3">
+        {/* FORM */}
+        <div className="mt-8 flex flex-col gap-3">
           <input
             placeholder="Your Name"
             value={form.name}
-            onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className="border p-2 rounded text-gray-900"
+            onChange={(e) =>
+              setForm({
+                ...form,
+                name: e.target.value,
+              })
+            }
+            className="
+              border
+              border-gray-200
+              bg-gray-50
+              p-3
+              rounded-lg
+              text-gray-900
+              focus:outline-none
+              focus:ring-2
+              focus:ring-blue-200
+            "
           />
 
           <input
             placeholder="Email Address"
             value={form.email}
-            onChange={(e) => setForm({ ...form, email: e.target.value })}
-            className="border p-2 rounded text-gray-900"
+            onChange={(e) =>
+              setForm({
+                ...form,
+                email: e.target.value,
+              })
+            }
+            className="
+              border
+              border-gray-200
+              bg-gray-50
+              p-3
+              rounded-lg
+              text-gray-900
+              focus:outline-none
+              focus:ring-2
+              focus:ring-blue-200
+            "
           />
         </div>
 
-        {/* 📌 SUMMARY */}
+        {/* SUMMARY */}
         {date && time && (
-          <p className="text-center mt-4 text-gray-700">
-            {date.toDateString()} at {time}
+          <p className="text-center mt-5 text-gray-700">
+            {date.toDateString()} at{" "}
+            <span className="font-semibold text-blue-900">{time}</span>
           </p>
         )}
 
-        {/* ✅ BOOK BUTTON */}
+        {/* BOOK BUTTON */}
         <button
           onClick={handleBooking}
-          className="mt-6 w-full bg-blue-600 text-white py-3 rounded hover:bg-blue-700 transition"
+          className="
+            mt-8
+            w-full
+            bg-blue-600
+            text-white
+            py-3
+            rounded-lg
+            hover:bg-blue-700
+            transition
+            font-semibold
+            shadow
+          "
         >
           Confirm Booking
         </button>

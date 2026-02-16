@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { db } from "../../lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
 
@@ -30,21 +31,95 @@ export default function BlogPage() {
   }, []);
 
   return (
-    <main className="p-10 max-w-6xl mx-auto text-white">
-      <h1 className="text-3xl font-bold mb-10">Blog</h1>
+    <main
+      className="
+        min-h-screen
+        py-24
+        px-6
+        bg-gradient-to-b
+        from-blue-50
+        to-white
+      "
+    >
+      <div className="max-w-6xl mx-auto">
+        {/* TITLE */}
+        <h1
+          className="
+            text-4xl
+            font-bold
+            text-blue-900
+            text-center
+            mb-4
+          "
+        >
+          Wellness Blog
+        </h1>
 
-      <div className="grid md:grid-cols-3 gap-6">
-        {posts.map((post) => (
-          <Link
-            key={post.id}
-            href={`/blog/${post.id}`}
-            className="bg-gray-900 p-4 rounded-xl"
-          >
-            {post.image && <img src={post.image} className="rounded mb-3" />}
+        {/* SUBTEXT */}
+        <p
+          className="
+            text-gray-600
+            text-center
+            max-w-2xl
+            mx-auto
+            mb-14
+          "
+        >
+          Insights, guidance, and hypnotherapy techniques to support your mental
+          clarity and emotional well-being.
+        </p>
 
-            <h2 className="font-semibold">{post.title}</h2>
-          </Link>
-        ))}
+        {/* POSTS GRID */}
+        <div
+          className="
+            grid
+            md:grid-cols-2
+            lg:grid-cols-3
+            gap-10
+          "
+        >
+          {posts.map((post) => (
+            <Link
+              key={post.id}
+              href={`/blog/${post.id}`}
+              className="
+                bg-white
+                rounded-2xl
+                overflow-hidden
+                shadow-md
+                hover:shadow-xl
+                transition
+                border border-gray-100
+              "
+            >
+              {/* IMAGE */}
+              {post.image && (
+                <div className="relative h-48 w-full">
+                  <Image
+                    src={post.image}
+                    alt={post.title}
+                    fill
+                    className="object-cover"
+                  />
+                </div>
+              )}
+
+              {/* CONTENT */}
+              <div className="p-5">
+                <h2
+                  className="
+                    font-semibold
+                    text-lg
+                    text-blue-900
+                    leading-snug
+                  "
+                >
+                  {post.title}
+                </h2>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
     </main>
   );

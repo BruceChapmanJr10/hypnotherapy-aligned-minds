@@ -27,11 +27,52 @@ export default function ServicesSection() {
   }, []);
 
   return (
-    <section className="py-20 px-6 bg-gray-300">
+    <section
+      className="
+        py-24
+        px-6
+        bg-gradient-to-b
+        from-blue-50
+        to-white
+      "
+    >
       <div className="max-w-6xl mx-auto text-center">
-        <h2 className="text-3xl text-gray-800 font-bold mb-12">Our Services</h2>
+        {/* TITLE */}
+        <h2
+          className="
+            text-3xl
+            md:text-4xl
+            font-bold
+            text-blue-900
+            mb-4
+          "
+        >
+          Our Services
+        </h2>
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* SUBTEXT */}
+        <p
+          className="
+            text-gray-600
+            max-w-2xl
+            mx-auto
+            mb-14
+            leading-relaxed
+          "
+        >
+          Personalized hypnotherapy sessions designed to support healing,
+          clarity, and lasting change.
+        </p>
+
+        {/* GRID */}
+        <div
+          className="
+            grid
+            md:grid-cols-2
+            lg:grid-cols-3
+            gap-10
+          "
+        >
           {services.map((service) => (
             <ServiceCard
               key={service.id}
@@ -42,6 +83,7 @@ export default function ServicesSection() {
         </div>
       </div>
 
+      {/* MODAL */}
       <ServiceModal
         service={selectedService}
         onClose={() => setSelectedService(null)}

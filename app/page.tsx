@@ -41,9 +41,9 @@ export default function HomePage() {
     <main>
       <HeroSection title={content.title} heroImage={content.heroImage} />
 
-      <AboutSection title={content.aboutTitle} text={content.aboutText} />
-
       <ServicesSection />
+
+      <AboutSection title={content.aboutTitle} text={content.aboutText} />
 
       <BlogPreview />
     </main>

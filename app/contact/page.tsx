@@ -49,16 +49,54 @@ export default function ContactPage() {
   };
 
   return (
-    <main className="py-20 px-6 bg-gray-950 min-h-screen text-white">
-      <div className="max-w-2xl mx-auto bg-gray-900 p-10 rounded-2xl shadow-xl border border-gray-800">
-        <h1 className="text-3xl font-bold mb-6 text-center">Contact Us</h1>
+    <main
+      className="
+        min-h-screen
+        py-24
+        px-6
+        bg-gradient-to-b
+        from-blue-50
+        to-white
+        flex
+        items-center
+        justify-center
+      "
+    >
+      {/* CARD */}
+      <div
+        className="
+          w-full
+          max-w-2xl
+          bg-white
+          p-10
+          rounded-2xl
+          shadow-xl
+          border
+          border-blue-100
+        "
+      >
+        {/* TITLE */}
+        <h1
+          className="
+            text-3xl
+            md:text-4xl
+            font-bold
+            text-center
+            text-blue-900
+            mb-6
+          "
+        >
+          Contact Us
+        </h1>
 
+        {/* SUCCESS */}
         {success && (
-          <p className="text-green-400 text-center mb-6">
+          <p className="text-green-600 text-center mb-6 font-medium">
             Message sent successfully!
           </p>
         )}
 
+        {/* FORM */}
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           {/* NAME */}
           <input
@@ -66,8 +104,19 @@ export default function ContactPage() {
             placeholder="Your Name"
             value={form.name}
             onChange={handleChange}
-            className="bg-gray-800 border border-gray-700 p-3 rounded text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
             required
+            className="
+              bg-gray-50
+              border
+              border-gray-200
+              p-3
+              rounded-lg
+              text-gray-900
+              placeholder-gray-400
+              focus:outline-none
+              focus:ring-2
+              focus:ring-blue-200
+            "
           />
 
           {/* EMAIL */}
@@ -77,8 +126,19 @@ export default function ContactPage() {
             placeholder="Email Address"
             value={form.email}
             onChange={handleChange}
-            className="bg-gray-800 border border-gray-700 p-3 rounded text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
             required
+            className="
+              bg-gray-50
+              border
+              border-gray-200
+              p-3
+              rounded-lg
+              text-gray-900
+              placeholder-gray-400
+              focus:outline-none
+              focus:ring-2
+              focus:ring-blue-200
+            "
           />
 
           {/* MESSAGE */}
@@ -88,15 +148,36 @@ export default function ContactPage() {
             value={form.message}
             onChange={handleChange}
             rows={5}
-            className="bg-gray-800 border border-gray-700 p-3 rounded text-white placeholder-gray-400 focus:outline-none focus:border-blue-500"
             required
+            className="
+              bg-gray-50
+              border
+              border-gray-200
+              p-3
+              rounded-lg
+              text-gray-900
+              placeholder-gray-400
+              focus:outline-none
+              focus:ring-2
+              focus:ring-blue-200
+            "
           />
 
           {/* BUTTON */}
           <button
             type="submit"
             disabled={loading}
-            className="bg-blue-600 hover:bg-blue-700 text-white py-3 rounded font-semibold transition"
+            className="
+              bg-blue-600
+              hover:bg-blue-700
+              text-white
+              py-3
+              rounded-lg
+              font-semibold
+              transition
+              shadow
+              mt-2
+            "
           >
             {loading ? "Sending..." : "Send Message"}
           </button>

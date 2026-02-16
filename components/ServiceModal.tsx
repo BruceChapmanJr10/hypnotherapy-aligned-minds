@@ -11,24 +11,94 @@ export default function ServiceModal({ service, onClose }: Props) {
   if (!service) return null;
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-      <div className="bg-white rounded-xl max-w-lg w-full p-6 relative">
+    <div
+      className="
+      fixed inset-0
+      bg-blue-950/40
+      backdrop-blur-sm
+      flex items-center justify-center
+      z-50
+      p-4
+    "
+    >
+      {/* MODAL CARD */}
+      <div
+        className="
+        relative
+        bg-white
+        rounded-2xl
+        max-w-lg
+        w-full
+        p-8
+        shadow-xl
+        border border-gray-200
+        max-h-[90vh]
+        overflow-y-auto
+      "
+      >
+        {/* CLOSE BUTTON */}
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-gray-500"
+          className="
+            absolute
+            top-4 right-4
+            w-9 h-9
+            flex items-center justify-center
+            rounded-full
+            bg-gray-100
+            text-gray-600
+            hover:bg-blue-100
+            hover:text-blue-700
+            transition
+            shadow-sm
+          "
         >
           ✕
         </button>
 
-        <h2 className="text-2xl text-gray-800 font-bold mb-4">
+        {/* TITLE */}
+        <h2
+          className="
+          text-2xl
+          font-bold
+          text-blue-900
+          mb-4
+        "
+        >
           {service.title}
         </h2>
 
-        <p className="mb-4 text-gray-800">{service.description}</p>
-
-        <p className="font-semibold text-gray-800 text-lg">
-          Price: {service.price}
+        {/* DESCRIPTION */}
+        <p
+          className="
+          text-gray-700
+          leading-relaxed
+          mb-6
+        "
+        >
+          {service.description}
         </p>
+
+        {/* PRICE */}
+        <div
+          className="
+          bg-blue-50
+          border border-blue-100
+          rounded-xl
+          p-4
+          text-center
+        "
+        >
+          <p
+            className="
+            font-semibold
+            text-blue-900
+            text-lg
+          "
+          >
+            Price: {service.price}
+          </p>
+        </div>
       </div>
     </div>
   );
