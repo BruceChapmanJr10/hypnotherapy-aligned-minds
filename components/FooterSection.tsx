@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase";
-import { collection, addDoc, Timestamp } from "firebase/firestore";
+import { collection, addDoc, Timestamp, doc, getDoc } from "firebase/firestore";
 
 export default function Footer() {
   const [form, setForm] = useState({
@@ -11,9 +11,25 @@ export default function Footer() {
     message: "",
   });
 
+  const [content, setContent] = useState<any>(null);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
+  // 🔹 Fetch footer CMS content
+  useEffect(() => {
+    const fetchFooter = async () => {
+      const ref = doc(db, "content", "footer");
+      const snap = await getDoc(ref);
+
+      if (snap.exists()) {
+        setContent(snap.data());
+      }
+    };
+
+    fetchFooter();
+  }, []);
+
+  // 🔹 Handle form input
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -23,6 +39,7 @@ export default function Footer() {
     });
   };
 
+  // 🔹 Submit contact form
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -39,28 +56,28 @@ export default function Footer() {
     setTimeout(() => setSuccess(false), 4000);
   };
 
+  if (!content) return null;
+
   return (
     <footer className="bg-gray-100 border-t border-gray-200">
       <div className="max-w-7xl mx-auto px-6 py-16 grid md:grid-cols-2 gap-12">
-        {/* LEFT — CONTACT INFO */}
+        {/* LEFT — CMS CONTACT INFO */}
         <div className="flex flex-col gap-4 text-gray-800">
           <h2 className="text-2xl font-bold text-blue-900">
-            Aligned Minds Hypnotherapy
+            {content.businessName}
           </h2>
 
-          <p className="text-gray-600">
-            Transform your mindset and create lasting change through
-            professional hypnotherapy sessions.
-          </p>
+          <p className="text-gray-600">{content.description}</p>
 
           <div className="mt-6 flex flex-col gap-2 text-gray-700">
-            <p>📍 Winchester, Virginia</p>
-            <p>📞 (540) 000‑0000</p>
-            <p>✉️ info@alignedmindshypnotherapy.com</p>
+            <p>📍 {content.address}</p>
+            <p>📞 {content.phone}</p>
+            <p>✉️ {content.email}</p>
           </div>
 
           <p className="text-sm text-gray-500 mt-8">
-            © {new Date().getFullYear()} Aligned Minds. All rights reserved.
+            © {new Date().getFullYear()} {content.businessName}. All rights
+            reserved.
           </p>
         </div>
 
@@ -71,31 +88,31 @@ export default function Footer() {
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <input
               name="name"
-              placeholder="Your Name"
+              placeholder="Full Name"
               value={form.name}
               onChange={handleChange}
               required
-              className="bg-white border border-gray-300 p-3 rounded"
+              className="bg-white border border-gray-300 p-3 rounded placeholder-gray-500 text-gray-900"
             />
 
             <input
               name="email"
               type="email"
-              placeholder="Your Email"
+              placeholder="Email Address"
               value={form.email}
               onChange={handleChange}
               required
-              className="bg-white border border-gray-300 p-3 rounded"
+              className="bg-white border border-gray-300 p-3 rounded placeholder-gray-500 text-gray-900"
             />
 
             <textarea
               name="message"
-              placeholder="Your Message"
+              placeholder="How can we help you\?"
               value={form.message}
               onChange={handleChange}
               rows={4}
               required
-              className="bg-white border border-gray-300 p-3 rounded"
+              className="bg-white border border-gray-300 p-3 rounded placeholder-gray-500 text-gray-900"
             />
 
             <button

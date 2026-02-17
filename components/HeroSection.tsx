@@ -2,16 +2,30 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import BookingModal from "./BookingModal";
+import { db } from "@/lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
 
-interface Props {
-  title: string;
-  heroImage: string;
-}
-
-export default function HeroSection({ title, heroImage }: Props) {
+export default function HeroSection() {
   const [openBooking, setOpenBooking] = useState(false);
+  const [content, setContent] = useState<any>(null);
+
+  // 🔹 Fetch hero CMS content
+  useEffect(() => {
+    const fetchHero = async () => {
+      const ref = doc(db, "content", "hero");
+      const snap = await getDoc(ref);
+
+      if (snap.exists()) {
+        setContent(snap.data());
+      }
+    };
+
+    fetchHero();
+  }, []);
+
+  if (!content) return null;
 
   return (
     <section
@@ -30,13 +44,20 @@ export default function HeroSection({ title, heroImage }: Props) {
         text-5xl
         md:text-6xl
         font-bold
-        mb-8
+        mb-6
         text-blue-900
         tracking-tight
       "
       >
-        {title}
+        {content.title}
       </h1>
+
+      {/* SUBTITLE */}
+      {content.subtitle && (
+        <p className="text-lg text-gray-600 mb-10 max-w-2xl mx-auto">
+          {content.subtitle}
+        </p>
+      )}
 
       {/* CTA BUTTONS */}
       <div
@@ -87,7 +108,7 @@ export default function HeroSection({ title, heroImage }: Props) {
       </div>
 
       {/* HERO IMAGE */}
-      {heroImage && (
+      {content.imageUrl && (
         <div className="flex justify-center">
           <div
             className="
@@ -106,7 +127,7 @@ export default function HeroSection({ title, heroImage }: Props) {
           "
           >
             <Image
-              src={heroImage}
+              src={content.imageUrl}
               alt="Hero"
               fill
               className="object-cover"

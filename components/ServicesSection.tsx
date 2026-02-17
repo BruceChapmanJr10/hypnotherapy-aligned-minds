@@ -35,6 +35,7 @@ export default function ServicesSection() {
         from-blue-50
         to-white
       "
+      id="services"
     >
       <div className="max-w-6xl mx-auto text-center">
         {/* TITLE */}
