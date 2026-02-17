@@ -25,10 +25,14 @@ export default function BlogPreview() {
 
       const snapshot = await getDocs(q);
 
-      const data = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...(doc.data() as Post),
-      }));
+      const data: Post[] = snapshot.docs.map((doc) => {
+        const postData = doc.data() as Omit<Post, "id">;
+
+        return {
+          ...postData,
+          id: doc.id,
+        };
+      });
 
       setPosts(data);
     };
