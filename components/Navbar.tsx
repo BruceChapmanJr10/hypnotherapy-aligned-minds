@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import BookingModal from "./BookingModal";
+import BookingModal from "@/components/BookingModal";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
