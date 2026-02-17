@@ -59,11 +59,11 @@ export default function AdminLayout({
             <Link href="/admin/hero">Hero Editor</Link>
             <Link href="/admin/about">About Editor</Link>
             <Link href="/admin/services">Services Editor</Link>
+            <Link href="/admin/blog">Blog Manager</Link>
+            <Link href="/admin/footer">Footer Editor</Link>
             <Link href="/admin/bookings">Bookings</Link>
             <Link href="/admin/availability">Availability</Link>
             <Link href="/admin/contact">Contact Inbox</Link>
-            <Link href="/admin/blog">Blog Manager</Link>
-            <Link href="/admin/footer">Footer Editor</Link>
           </nav>
         </div>
 
