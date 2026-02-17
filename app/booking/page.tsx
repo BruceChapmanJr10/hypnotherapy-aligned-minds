@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import BookingModal from "../components/BookingModal";
+import BookingModal from "@/components/BookingModal";
 
 export default function BookingPage() {
   const [openBooking, setOpenBooking] = useState(true);
