@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import BookingModal from "./BookingModal";
+import BookingModal from "@/components/BookingModal";
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 
