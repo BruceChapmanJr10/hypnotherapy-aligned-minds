@@ -50,7 +50,7 @@ export default function BookingModal({ isOpen, onClose }: Props) {
     fetchAvailability();
   }, []);
 
-  // 🔹 Fetch booked slots
+  // Fetch booked slots
   useEffect(() => {
     if (!date) return;
 

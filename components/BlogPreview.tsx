@@ -14,7 +14,7 @@ interface Post {
 export default function BlogPreview() {
   const [posts, setPosts] = useState<Post[]>([]);
 
-  // 🔹 Fetch latest posts
+  //  Fetch latest posts
   useEffect(() => {
     const fetchPosts = async () => {
       const q = query(

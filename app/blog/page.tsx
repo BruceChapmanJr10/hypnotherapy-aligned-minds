@@ -19,10 +19,15 @@ export default function BlogPage() {
     const fetchPosts = async () => {
       const snapshot = await getDocs(collection(db, "blogPosts"));
 
-      const data = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...(doc.data() as Post),
-      }));
+      // ✅ FIX — prevent duplicate id typing
+      const data: Post[] = snapshot.docs.map((doc) => {
+        const postData = doc.data() as Omit<Post, "id">;
+
+        return {
+          id: doc.id,
+          ...postData,
+        };
+      });
 
       setPosts(data);
     };
