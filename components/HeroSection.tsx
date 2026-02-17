@@ -7,11 +7,18 @@ import BookingModal from "@/components/BookingModal";
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 
+import { Sofia } from "next/font/google";
+
+const sofia = Sofia({
+  subsets: ["latin"],
+  weight: ["400"],
+});
+
 export default function HeroSection() {
   const [openBooking, setOpenBooking] = useState(false);
   const [content, setContent] = useState<any>(null);
 
-  // 🔹 Fetch hero CMS content
+  // Fetch hero CMS content
   useEffect(() => {
     const fetchHero = async () => {
       const ref = doc(db, "content", "hero");
@@ -40,14 +47,15 @@ export default function HeroSection() {
     >
       {/* TITLE */}
       <h1
-        className="
+        className={`
+        ${sofia.className}
         text-5xl
         md:text-6xl
         font-bold
         mb-6
         text-blue-900
         tracking-tight
-      "
+      `}
       >
         {content.title}
       </h1>
