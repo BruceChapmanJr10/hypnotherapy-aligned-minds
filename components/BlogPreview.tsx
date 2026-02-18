@@ -5,6 +5,12 @@ import Link from "next/link";
 import { db } from "../lib/firebase";
 import { collection, getDocs, query, orderBy, limit } from "firebase/firestore";
 
+export const metadata = {
+  title: "Aligned Minds | Home",
+  description:
+    "Book hypnotherapy sessions designed to help you overcome stress, anxiety, and limiting beliefs.",
+};
+
 interface Post {
   id: string;
   title: string;

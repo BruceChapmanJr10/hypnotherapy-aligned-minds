@@ -9,6 +9,12 @@ import { doc, getDoc } from "firebase/firestore";
 
 import { Sofia } from "next/font/google";
 
+export const metadata = {
+  title: "Aligned Minds | Home",
+  description:
+    "Book hypnotherapy sessions designed to help you overcome stress, anxiety, and limiting beliefs.",
+};
+
 const sofia = Sofia({
   subsets: ["latin"],
   weight: ["400"],

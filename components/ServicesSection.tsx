@@ -7,6 +7,12 @@ import { Service } from "../types/service";
 import ServiceCard from "./ServiceCard";
 import ServiceModal from "./ServiceModal";
 
+export const metadata = {
+  title: "Aligned Minds | Home",
+  description:
+    "Book hypnotherapy sessions designed to help you overcome stress, anxiety, and limiting beliefs.",
+};
+
 export default function ServicesSection() {
   const [services, setServices] = useState<Service[]>([]);
   const [selectedService, setSelectedService] = useState<Service | null>(null);

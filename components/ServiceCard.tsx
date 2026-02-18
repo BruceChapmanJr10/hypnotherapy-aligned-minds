@@ -3,6 +3,12 @@
 import Image from "next/image";
 import { Service } from "../types/service";
 
+export const metadata = {
+  title: "Aligned Minds | Home",
+  description:
+    "Book hypnotherapy sessions designed to help you overcome stress, anxiety, and limiting beliefs.",
+};
+
 interface Props {
   service: Service;
   onClick: () => void;

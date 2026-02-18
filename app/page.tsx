@@ -1,27 +1,22 @@
-"use client";
-
-import ServicesSection from "../components/ServicesSection";
-import AboutSection from "../components/AboutSection";
 import HeroSection from "@/components/HeroSection";
+import ServicesSection from "@/components/ServicesSection";
+import AboutSection from "@/components/AboutSection";
 import BlogPreview from "@/components/BlogPreview";
 import Footer from "@/components/FooterSection";
+
+export const metadata = {
+  title: "Aligned Minds | Home",
+  description:
+    "Book hypnotherapy sessions designed to help you overcome stress, anxiety, and limiting beliefs.",
+};
 
 export default function HomePage() {
   return (
     <main>
-      {/* HERO — CMS CONTROLLED */}
       <HeroSection />
-
-      {/* SERVICES */}
       <ServicesSection />
-
-      {/* ABOUT — CMS CONTROLLED */}
       <AboutSection />
-
-      {/* BLOG PREVIEW */}
       <BlogPreview />
-
-      {/* FOOTER — CMS CONTROLLED */}
       <Footer />
     </main>
   );

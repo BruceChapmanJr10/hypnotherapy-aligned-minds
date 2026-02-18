@@ -17,6 +17,12 @@ import {
   updateDoc,
 } from "firebase/firestore";
 
+export const metadata = {
+  title: "Aligned Minds | Home",
+  description:
+    "Book hypnotherapy sessions designed to help you overcome stress, anxiety, and limiting beliefs.",
+};
+
 interface Props {
   isOpen: boolean;
   onClose: () => void;
