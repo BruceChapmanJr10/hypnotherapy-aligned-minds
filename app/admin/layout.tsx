@@ -56,6 +56,7 @@ export default function AdminLayout({
 
           <nav className="flex flex-col gap-4 text-sm">
             <Link href="/admin">Dashboard</Link>
+            <Link href="/admin/seo">SEO Manager</Link>
             <Link href="/admin/hero">Hero Editor</Link>
             <Link href="/admin/about">About Editor</Link>
             <Link href="/admin/services">Services Editor</Link>

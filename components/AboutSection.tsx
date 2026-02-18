@@ -5,12 +5,6 @@ import Image from "next/image";
 import { db } from "../lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 
-export const metadata = {
-  title: "Aligned Minds | Home",
-  description:
-    "Book hypnotherapy sessions designed to help you overcome stress, anxiety, and limiting beliefs.",
-};
-
 export default function AboutSection() {
   const [content, setContent] = useState<any>(null);
 
@@ -37,7 +31,7 @@ export default function AboutSection() {
           <div className="relative h-[360px] w-full rounded-2xl overflow-hidden shadow-sm border border-gray-200">
             <Image
               src={content.image}
-              alt="About"
+              alt="About Aligned Minds Hypnotherapy"
               fill
               className="object-cover"
             />

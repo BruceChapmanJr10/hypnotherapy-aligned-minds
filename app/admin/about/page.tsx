@@ -10,11 +10,15 @@ export default function AdminAboutPage() {
     title: "",
     text: "",
     image: "",
+
+    // ✅ SEO FIELDS
+    seoTitle: "",
+    seoDescription: "",
   });
 
   const [loading, setLoading] = useState(true);
 
-  // Fetch about content
+  // 🔹 Fetch about content
   useEffect(() => {
     const fetchData = async () => {
       const ref = doc(db, "content", "about");
@@ -40,7 +44,7 @@ export default function AdminAboutPage() {
     });
   };
 
-  // Handle image upload
+  // 🔹 Handle image upload
   const handleImageUpload = (url: string) => {
     setForm({
       ...form,
@@ -48,7 +52,7 @@ export default function AdminAboutPage() {
     });
   };
 
-  // Save content
+  // 🔹 Save content
   const handleSave = async () => {
     const ref = doc(db, "content", "about");
 
@@ -66,6 +70,12 @@ export default function AdminAboutPage() {
       <h1 className="text-3xl font-bold mb-10">Edit About Section</h1>
 
       <div className="flex flex-col gap-6">
+        {/* =========================
+           CONTENT SECTION
+        ========================== */}
+
+        <h2 className="text-xl font-semibold text-gray-700">About Content</h2>
+
         {/* TITLE */}
         <input
           name="title"
@@ -85,7 +95,7 @@ export default function AdminAboutPage() {
           className="border p-3 rounded"
         />
 
-        {/* CLOUDINARY UPLOAD */}
+        {/* IMAGE UPLOAD */}
         <CldUploadWidget
           uploadPreset="aligned_minds_unsigned"
           onSuccess={(result: any) => {
@@ -111,6 +121,33 @@ export default function AdminAboutPage() {
             className="w-full h-64 object-cover rounded"
           />
         )}
+
+        {/* =========================
+           SEO SECTION
+        ========================== */}
+
+        <h2 className="text-xl font-semibold text-gray-700 mt-6">
+          About Page SEO
+        </h2>
+
+        {/* SEO TITLE */}
+        <input
+          name="seoTitle"
+          placeholder="SEO Title (Google Page Title)"
+          value={form.seoTitle}
+          onChange={handleChange}
+          className="border p-3 rounded"
+        />
+
+        {/* SEO DESCRIPTION */}
+        <textarea
+          name="seoDescription"
+          placeholder="SEO Meta Description (Appears in Google results)"
+          value={form.seoDescription}
+          onChange={handleChange}
+          rows={3}
+          className="border p-3 rounded"
+        />
 
         {/* SAVE */}
         <button

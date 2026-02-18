@@ -20,6 +20,10 @@ interface Service {
   price: string;
   image: string;
   active: boolean;
+
+  // ✅ SEO FIELDS
+  seoTitle: string;
+  seoDescription: string;
 }
 
 export default function AdminServicesPage() {
@@ -32,9 +36,12 @@ export default function AdminServicesPage() {
     price: "",
     image: "",
     active: true,
+
+    seoTitle: "",
+    seoDescription: "",
   });
 
-  //  Fetch Services
+  // 🔹 Fetch Services
   const fetchServices = async () => {
     const snapshot = await getDocs(collection(db, "services"));
 
@@ -50,7 +57,7 @@ export default function AdminServicesPage() {
     fetchServices();
   }, []);
 
-  //  Handle Input
+  // 🔹 Handle Input
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -60,7 +67,7 @@ export default function AdminServicesPage() {
     });
   };
 
-  //  Handle Image Upload
+  // 🔹 Handle Image Upload
   const handleImageUpload = (url: string) => {
     setForm({
       ...form,
@@ -68,22 +75,18 @@ export default function AdminServicesPage() {
     });
   };
 
-  //  Add / Update Service
+  // 🔹 Add / Update Service
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    const { id, ...serviceData } = form;
+
     if (editingId) {
-      const { id, ...serviceData } = form;
-
       await updateDoc(doc(db, "services", editingId), serviceData);
-
       alert("Service updated!");
       setEditingId(null);
     } else {
-      const { id, ...serviceData } = form;
-
       await addDoc(collection(db, "services"), serviceData);
-
       alert("Service added!");
     }
 
@@ -93,12 +96,14 @@ export default function AdminServicesPage() {
       price: "",
       image: "",
       active: true,
+      seoTitle: "",
+      seoDescription: "",
     });
 
     fetchServices();
   };
 
-  // Delete Service
+  // 🔹 Delete Service
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this service?")) return;
 
@@ -106,7 +111,7 @@ export default function AdminServicesPage() {
     fetchServices();
   };
 
-  // Edit Service
+  // 🔹 Edit Service
   const handleEdit = (service: Service) => {
     setForm(service);
     setEditingId(service.id || null);
@@ -116,8 +121,12 @@ export default function AdminServicesPage() {
     <main className="p-10 max-w-4xl mx-auto">
       <h1 className="text-3xl font-bold mb-10">Manage Services</h1>
 
-      {/* FORM */}
+      {/* =========================
+          FORM
+      ========================== */}
       <form onSubmit={handleSubmit} className="flex flex-col gap-4 mb-16">
+        <h2 className="text-xl font-semibold text-gray-700">Service Content</h2>
+
         <input
           name="title"
           placeholder="Service Title"
@@ -146,7 +155,7 @@ export default function AdminServicesPage() {
           required
         />
 
-        {/* CLOUDINARY UPLOAD */}
+        {/* IMAGE UPLOAD */}
         <CldUploadWidget
           uploadPreset="aligned_minds_unsigned"
           onSuccess={(result: any) => {
@@ -164,7 +173,6 @@ export default function AdminServicesPage() {
           )}
         </CldUploadWidget>
 
-        {/* IMAGE PREVIEW */}
         {form.image && (
           <div className="relative w-48 h-32 mt-2">
             <img
@@ -175,12 +183,40 @@ export default function AdminServicesPage() {
           </div>
         )}
 
+        {/* =========================
+            SEO SECTION
+        ========================== */}
+
+        <h2 className="text-xl font-semibold text-gray-700 mt-6">
+          Service SEO
+        </h2>
+
+        <input
+          name="seoTitle"
+          placeholder="SEO Title (Google Page Title)"
+          value={form.seoTitle}
+          onChange={handleChange}
+          className="border p-3"
+        />
+
+        <textarea
+          name="seoDescription"
+          placeholder="SEO Meta Description"
+          value={form.seoDescription}
+          onChange={handleChange}
+          rows={3}
+          className="border p-3"
+        />
+
         <button className="bg-blue-600 text-white p-3 rounded">
           {editingId ? "Update Service" : "Add Service"}
         </button>
       </form>
 
-      {/* SERVICE LIST */}
+      {/* =========================
+          SERVICE LIST
+      ========================== */}
+
       <div className="grid md:grid-cols-2 gap-6">
         {services.map((service) => (
           <div
