@@ -34,7 +34,7 @@ export default function AdminServicesPage() {
     active: true,
   });
 
-  // 🔹 Fetch Services
+  //  Fetch Services
   const fetchServices = async () => {
     const snapshot = await getDocs(collection(db, "services"));
 
@@ -50,7 +50,7 @@ export default function AdminServicesPage() {
     fetchServices();
   }, []);
 
-  // 🔹 Handle Input
+  //  Handle Input
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -60,7 +60,7 @@ export default function AdminServicesPage() {
     });
   };
 
-  // 🔹 Handle Image Upload
+  //  Handle Image Upload
   const handleImageUpload = (url: string) => {
     setForm({
       ...form,
@@ -68,7 +68,7 @@ export default function AdminServicesPage() {
     });
   };
 
-  // 🔹 Add / Update Service
+  //  Add / Update Service
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -98,7 +98,7 @@ export default function AdminServicesPage() {
     fetchServices();
   };
 
-  // 🔹 Delete Service
+  // Delete Service
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this service?")) return;
 
@@ -106,7 +106,7 @@ export default function AdminServicesPage() {
     fetchServices();
   };
 
-  // 🔹 Edit Service
+  // Edit Service
   const handleEdit = (service: Service) => {
     setForm(service);
     setEditingId(service.id || null);
@@ -146,7 +146,7 @@ export default function AdminServicesPage() {
           required
         />
 
-        {/* 🔹 CLOUDINARY UPLOAD */}
+        {/* CLOUDINARY UPLOAD */}
         <CldUploadWidget
           uploadPreset="aligned_minds_unsigned"
           onSuccess={(result: any) => {
@@ -164,7 +164,7 @@ export default function AdminServicesPage() {
           )}
         </CldUploadWidget>
 
-        {/* 🔹 IMAGE PREVIEW */}
+        {/* IMAGE PREVIEW */}
         {form.image && (
           <div className="relative w-48 h-32 mt-2">
             <img

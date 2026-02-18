@@ -14,7 +14,7 @@ export default function AdminHeroPage() {
 
   const [loading, setLoading] = useState(true);
 
-  // 🔹 Fetch Hero Content
+  // Fetch Hero Content
   const fetchHero = async () => {
     const docRef = doc(db, "content", "hero");
     const snapshot = await getDoc(docRef);
@@ -30,7 +30,7 @@ export default function AdminHeroPage() {
     fetchHero();
   }, []);
 
-  // 🔹 Handle Text Input
+  // Handle Text Input
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm({
       ...form,
@@ -38,7 +38,7 @@ export default function AdminHeroPage() {
     });
   };
 
-  // 🔹 Handle Image Upload
+  //  Handle Image Upload
   const handleImageUpload = (url: string) => {
     setForm({
       ...form,
@@ -46,7 +46,7 @@ export default function AdminHeroPage() {
     });
   };
 
-  // 🔹 Save Hero Content
+  // Save Hero Content
   const handleSave = async () => {
     const docRef = doc(db, "content", "hero");
 

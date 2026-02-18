@@ -15,7 +15,7 @@ export default function Footer() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  // 🔹 Fetch footer CMS content
+  // Fetch footer CMS content
   useEffect(() => {
     const fetchFooter = async () => {
       const ref = doc(db, "content", "footer");
@@ -29,7 +29,7 @@ export default function Footer() {
     fetchFooter();
   }, []);
 
-  // 🔹 Handle form input
+  // Handle form input
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -39,7 +39,7 @@ export default function Footer() {
     });
   };
 
-  // 🔹 Submit contact form
+  // Submit contact form
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);

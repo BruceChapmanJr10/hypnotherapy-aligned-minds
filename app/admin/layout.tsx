@@ -42,7 +42,7 @@ export default function AdminLayout({
     );
   }
 
-  // 🔹 Login page has no sidebar
+  //  Login page has no sidebar
   if (isLoginPage) {
     return <>{children}</>;
   }

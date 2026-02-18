@@ -30,7 +30,7 @@ export default function AdminBlogPage() {
     image: "",
   });
 
-  // 🔹 Fetch posts
+  // Fetch posts
   const fetchPosts = async () => {
     const snapshot = await getDocs(collection(db, "blogPosts"));
 
@@ -56,7 +56,7 @@ export default function AdminBlogPage() {
     });
   };
 
-  // 🔹 Handle image upload
+  // Handle image upload
   const handleImageUpload = (url: string) => {
     setForm({
       ...form,
@@ -64,7 +64,7 @@ export default function AdminBlogPage() {
     });
   };
 
-  // 🔹 Add post
+  // Add post
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -82,7 +82,7 @@ export default function AdminBlogPage() {
     fetchPosts();
   };
 
-  // 🔹 Delete
+  // Delete
   const handleDelete = async (id: string) => {
     await deleteDoc(doc(db, "blogPosts", id));
     fetchPosts();
@@ -103,7 +103,7 @@ export default function AdminBlogPage() {
           required
         />
 
-        {/* 🔹 CLOUDINARY UPLOAD */}
+        {/* CLOUDINARY UPLOAD */}
         <CldUploadWidget
           uploadPreset="aligned_minds_unsigned"
           onSuccess={(result: any) => {
@@ -121,7 +121,7 @@ export default function AdminBlogPage() {
           )}
         </CldUploadWidget>
 
-        {/* 🔹 IMAGE PREVIEW */}
+        {/* IMAGE PREVIEW */}
         {form.image && (
           <img
             src={form.image}

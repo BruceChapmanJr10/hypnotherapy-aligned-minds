@@ -14,6 +14,7 @@ import {
   query,
   where,
   getDocs,
+  updateDoc,
 } from "firebase/firestore";
 
 interface Props {
@@ -23,11 +24,9 @@ interface Props {
 
 export default function BookingModal({ isOpen, onClose }: Props) {
   const [availability, setAvailability] = useState<any>({});
-
   const [date, setDate] = useState<Date | null>(new Date());
-
   const [time, setTime] = useState<string | null>(null);
-
+  const [duration, setDuration] = useState<number>(60);
   const [bookedSlots, setBookedSlots] = useState<string[]>([]);
 
   const [form, setForm] = useState({
@@ -35,22 +34,22 @@ export default function BookingModal({ isOpen, onClose }: Props) {
     email: "",
   });
 
-  // 🔹 Fetch availability
+  const [bookingId, setBookingId] = useState<string | null>(null);
+  const [depositPaid, setDepositPaid] = useState(false);
+
+  //  Fetch availability
   useEffect(() => {
     const fetchAvailability = async () => {
       const ref = doc(db, "availability", "schedule");
-
       const snap = await getDoc(ref);
 
-      if (snap.exists()) {
-        setAvailability(snap.data());
-      }
+      if (snap.exists()) setAvailability(snap.data());
     };
 
     fetchAvailability();
   }, []);
 
-  // Fetch booked slots
+  //  Fetch booked slots
   useEffect(() => {
     if (!date) return;
 
@@ -63,7 +62,6 @@ export default function BookingModal({ isOpen, onClose }: Props) {
       );
 
       const snapshot = await getDocs(q);
-
       const booked = snapshot.docs.map((doc) => doc.data().time);
 
       setBookedSlots(booked);
@@ -72,20 +70,15 @@ export default function BookingModal({ isOpen, onClose }: Props) {
     fetchBookings();
   }, [date]);
 
-  const getDayName = (date: Date) => {
-    return date
-      .toLocaleDateString("en-US", {
-        weekday: "long",
-      })
-      .toLowerCase();
-  };
+  const getDayName = (date: Date) =>
+    date.toLocaleDateString("en-US", { weekday: "long" }).toLowerCase();
 
   if (!isOpen) return null;
 
   const dayName = date ? getDayName(date) : "";
-
   const allSlots: string[] = availability[dayName] || [];
 
+  // 🔹 Confirm Booking
   const handleBooking = async () => {
     if (!date || !time) {
       alert("Please select a date and time.");
@@ -97,29 +90,37 @@ export default function BookingModal({ isOpen, onClose }: Props) {
       return;
     }
 
-    try {
-      await addDoc(collection(db, "bookings"), {
-        name: form.name,
-        email: form.email,
-        date: date.toISOString().split("T")[0],
-        time: time,
-        createdAt: Timestamp.now(),
+    const docRef = await addDoc(collection(db, "bookings"), {
+      name: form.name,
+      email: form.email,
+      date: date.toISOString().split("T")[0],
+      time,
+      duration,
+      depositPaid: false,
+      createdAt: Timestamp.now(),
+    });
+
+    setBookingId(docRef.id);
+    alert("Appointment booked! You can now pay deposit.");
+  };
+
+  // 🔹 Simulated Deposit
+  const simulateDeposit = async () => {
+    if (!bookingId) return;
+
+    alert("Redirecting to secure payment...");
+
+    setTimeout(async () => {
+      await updateDoc(doc(db, "bookings", bookingId), {
+        depositPaid: true,
       });
 
-      alert("Appointment booked successfully!");
+      setDepositPaid(true);
 
-      setTime(null);
-      setForm({
-        name: "",
-        email: "",
-      });
+      alert("Deposit Paid Successfully!");
 
       onClose();
-    } catch (error) {
-      console.error(error);
-
-      alert("Error booking appointment.");
-    }
+    }, 1500);
   };
 
   return (
@@ -127,24 +128,25 @@ export default function BookingModal({ isOpen, onClose }: Props) {
       {/* MODAL CARD */}
       <div
         className="
-        relative
-        bg-white
-        rounded-2xl
-        shadow-xl
-        w-full
-        max-w-md
-        max-h-[90vh]
-        overflow-y-auto
-        p-8
-        border border-gray-200
-      "
+          relative
+          bg-white
+          rounded-2xl
+          shadow-xl
+          w-full
+          max-w-md
+          max-h-[90vh]
+          overflow-y-auto
+          p-8
+          border border-gray-200
+        "
       >
-        {/* CLOSE BUTTON */}
+        {/* CLOSE */}
         <button
           onClick={onClose}
           className="
-            sticky top-0
-            ml-auto
+            absolute
+            top-4
+            right-4
             w-9 h-9
             flex items-center justify-center
             rounded-full
@@ -153,7 +155,6 @@ export default function BookingModal({ isOpen, onClose }: Props) {
             hover:bg-blue-100
             hover:text-blue-700
             transition
-            shadow-sm
           "
         >
           ✕
@@ -184,12 +185,6 @@ export default function BookingModal({ isOpen, onClose }: Props) {
             Select Time
           </h3>
 
-          {allSlots.length === 0 && (
-            <p className="text-gray-500 text-sm text-center">
-              No availability for this day.
-            </p>
-          )}
-
           <div className="grid grid-cols-3 gap-2">
             {allSlots.map((slot: string) => {
               const isBooked = bookedSlots.includes(slot);
@@ -216,17 +211,41 @@ export default function BookingModal({ isOpen, onClose }: Props) {
           </div>
         </div>
 
+        {/* DURATION */}
+        <div className="mt-8">
+          <h3 className="font-semibold text-gray-800 mb-2 text-center">
+            Session Length
+          </h3>
+
+          <select
+            value={duration}
+            onChange={(e) => setDuration(Number(e.target.value))}
+            className="
+              w-full
+              border
+              border-gray-200
+              bg-gray-50
+              p-3
+              rounded-lg
+              text-gray-900
+              focus:outline-none
+              focus:ring-2
+              focus:ring-blue-200
+            "
+          >
+            <option value={30}>30 Minutes</option>
+            <option value={60}>60 Minutes</option>
+            <option value={90}>90 Minutes</option>
+            <option value={120}>120 Minutes</option>
+          </select>
+        </div>
+
         {/* FORM */}
         <div className="mt-8 flex flex-col gap-3">
           <input
             placeholder="Your Name"
             value={form.name}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                name: e.target.value,
-              })
-            }
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
             className="
               border
               border-gray-200
@@ -243,12 +262,7 @@ export default function BookingModal({ isOpen, onClose }: Props) {
           <input
             placeholder="Email Address"
             value={form.email}
-            onChange={(e) =>
-              setForm({
-                ...form,
-                email: e.target.value,
-              })
-            }
+            onChange={(e) => setForm({ ...form, email: e.target.value })}
             className="
               border
               border-gray-200
@@ -267,7 +281,8 @@ export default function BookingModal({ isOpen, onClose }: Props) {
         {date && time && (
           <p className="text-center mt-5 text-gray-700">
             {date.toDateString()} at{" "}
-            <span className="font-semibold text-blue-900">{time}</span>
+            <span className="font-semibold text-blue-900">{time}</span> —{" "}
+            {duration} min
           </p>
         )}
 
@@ -289,6 +304,27 @@ export default function BookingModal({ isOpen, onClose }: Props) {
         >
           Confirm Booking
         </button>
+
+        {/* DEPOSIT BUTTON */}
+        {bookingId && !depositPaid && (
+          <button
+            onClick={simulateDeposit}
+            className="
+              mt-3
+              w-full
+              bg-green-600
+              text-white
+              py-3
+              rounded-lg
+              hover:bg-green-700
+              transition
+              font-semibold
+              shadow
+            "
+          >
+            Pay Deposit ($50)
+          </button>
+        )}
       </div>
     </div>
   );

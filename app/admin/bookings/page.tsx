@@ -17,6 +17,10 @@ interface Booking {
   email: string;
   date: string;
   time: string;
+  duration?: number;
+  price?: number;
+  depositAmount?: number;
+  depositPaid?: boolean;
 }
 
 export default function AdminBookingsPage() {
@@ -29,10 +33,21 @@ export default function AdminBookingsPage() {
 
     const snapshot = await getDocs(q);
 
-    const data = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...(doc.data() as Omit<Booking, "id">),
-    }));
+    const data: Booking[] = snapshot.docs.map((docSnap) => {
+      const data = docSnap.data();
+
+      return {
+        id: docSnap.id,
+        name: data.name,
+        email: data.email,
+        date: data.date,
+        time: data.time,
+        duration: data.duration || 60,
+        price: data.price || 0,
+        depositAmount: data.depositAmount || 0,
+        depositPaid: data.depositPaid || false,
+      };
+    });
 
     setBookings(data);
     setLoading(false);
@@ -47,7 +62,6 @@ export default function AdminBookingsPage() {
     if (!confirm("Cancel this booking?")) return;
 
     await deleteDoc(doc(db, "bookings", id));
-
     fetchBookings();
   };
 
@@ -56,8 +70,10 @@ export default function AdminBookingsPage() {
   }
 
   return (
-    <main className="p-10 max-w-6xl mx-auto">
-      <h1 className="text-3xl font-bold mb-10">Bookings Dashboard</h1>
+    <main className="p-10 max-w-7xl mx-auto">
+      <h1 className="text-3xl font-bold mb-10 text-blue-900">
+        Bookings Dashboard
+      </h1>
 
       {bookings.length === 0 && <p>No bookings yet.</p>}
 
@@ -69,6 +85,9 @@ export default function AdminBookingsPage() {
               <th className="p-3">Email</th>
               <th className="p-3">Date</th>
               <th className="p-3">Time</th>
+              <th className="p-3">Duration</th>
+              <th className="p-3">Price</th>
+              <th className="p-3">Deposit</th>
               <th className="p-3">Actions</th>
             </tr>
           </thead>
@@ -84,6 +103,26 @@ export default function AdminBookingsPage() {
 
                 <td className="p-3">{booking.time}</td>
 
+                {/* DURATION */}
+                <td className="p-3">{booking.duration} min</td>
+
+                {/* PRICE */}
+                <td className="p-3 font-semibold text-blue-900">
+                  ${booking.price}
+                </td>
+
+                {/* DEPOSIT STATUS */}
+                <td className="p-3">
+                  {booking.depositPaid ? (
+                    <span className="text-green-600 font-semibold">
+                      Paid (${booking.depositAmount})
+                    </span>
+                  ) : (
+                    <span className="text-red-500 font-semibold">Unpaid</span>
+                  )}
+                </td>
+
+                {/* ACTIONS */}
                 <td className="p-3">
                   <button
                     onClick={() => handleDelete(booking.id)}

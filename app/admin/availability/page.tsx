@@ -34,7 +34,7 @@ export default function AdminAvailabilityPage() {
     fetchData();
   }, []);
 
-  // 🔹 Add time
+  // Add time
   const addTime = (day: string) => {
     const time = prompt("Enter time (ex: 9:00 AM)");
 
@@ -46,7 +46,7 @@ export default function AdminAvailabilityPage() {
     }));
   };
 
-  // 🔹 Remove time
+  //  Remove time
   const removeTime = (day: string, index: number) => {
     const updated = [...availability[day]];
     updated.splice(index, 1);

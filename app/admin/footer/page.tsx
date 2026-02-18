@@ -15,7 +15,7 @@ export default function AdminFooterPage() {
 
   const [loading, setLoading] = useState(true);
 
-  // 🔹 Fetch footer content
+  // Fetch footer content
   useEffect(() => {
     const fetchData = async () => {
       const ref = doc(db, "content", "footer");
@@ -31,7 +31,7 @@ export default function AdminFooterPage() {
     fetchData();
   }, []);
 
-  // 🔹 Handle input
+  //  Handle input
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -41,7 +41,7 @@ export default function AdminFooterPage() {
     });
   };
 
-  // 🔹 Save
+  // Save
   const handleSave = async () => {
     const ref = doc(db, "content", "footer");
 

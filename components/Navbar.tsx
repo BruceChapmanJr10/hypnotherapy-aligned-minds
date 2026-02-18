@@ -69,6 +69,10 @@ export default function Navbar() {
               Blog
             </Link>
 
+            <Link href="/pricing" className="hover:text-blue-700 transition">
+              Pricing
+            </Link>
+
             <Link href="/contact" className="hover:text-blue-700 transition">
               Contact
             </Link>
@@ -122,6 +126,7 @@ export default function Navbar() {
           >
             <Link href="/">Home</Link>
             <Link href="/#services">Services</Link>
+            <Link href="/pricing">Pricing</Link>
             <Link href="/blog">Blog</Link>
             <Link href="/contact">Contact</Link>
 

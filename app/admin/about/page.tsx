@@ -14,7 +14,7 @@ export default function AdminAboutPage() {
 
   const [loading, setLoading] = useState(true);
 
-  // 🔹 Fetch about content
+  // Fetch about content
   useEffect(() => {
     const fetchData = async () => {
       const ref = doc(db, "content", "about");
@@ -40,7 +40,7 @@ export default function AdminAboutPage() {
     });
   };
 
-  // 🔹 Handle image upload
+  // Handle image upload
   const handleImageUpload = (url: string) => {
     setForm({
       ...form,
@@ -48,7 +48,7 @@ export default function AdminAboutPage() {
     });
   };
 
-  // 🔹 Save content
+  // Save content
   const handleSave = async () => {
     const ref = doc(db, "content", "about");
 
@@ -85,7 +85,7 @@ export default function AdminAboutPage() {
           className="border p-3 rounded"
         />
 
-        {/* 🔹 CLOUDINARY UPLOAD */}
+        {/* CLOUDINARY UPLOAD */}
         <CldUploadWidget
           uploadPreset="aligned_minds_unsigned"
           onSuccess={(result: any) => {
@@ -103,7 +103,7 @@ export default function AdminAboutPage() {
           )}
         </CldUploadWidget>
 
-        {/* 🔹 IMAGE PREVIEW */}
+        {/* IMAGE PREVIEW */}
         {form.image && (
           <img
             src={form.image}
