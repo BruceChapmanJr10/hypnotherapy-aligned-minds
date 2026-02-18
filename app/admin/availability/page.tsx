@@ -57,10 +57,9 @@ export default function AdminAvailabilityPage() {
     }));
   };
 
-  // 🔹 Save to Firestore
+  // 🔹 Save
   const saveAvailability = async () => {
     const ref = doc(db, "availability", "schedule");
-
     await updateDoc(ref, availability);
 
     alert("Availability updated!");
@@ -69,26 +68,54 @@ export default function AdminAvailabilityPage() {
   if (loading) return <p className="p-10">Loading...</p>;
 
   return (
-    <main className="p-10 max-w-5xl mx-auto">
-      <h1 className="text-3xl font-bold mb-10">Manage Availability</h1>
+    <main className="p-10 max-w-6xl mx-auto">
+      <h1 className="text-3xl font-bold mb-12 text-blue-900">
+        Manage Availability
+      </h1>
 
-      <div className="grid md:grid-cols-2 gap-8">
+      {/* DAYS GRID */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
         {days.map((day) => (
-          <div key={day} className="border rounded-xl p-6 bg-white shadow">
-            <h2 className="font-semibold text-lg capitalize mb-4">{day}</h2>
+          <div
+            key={day}
+            className="
+              bg-gray-900
+              border border-gray-800
+              rounded-2xl
+              p-6
+              shadow
+            "
+          >
+            {/* DAY HEADER */}
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-xl font-bold capitalize text-blue-400">
+                {day}
+              </h2>
 
-            {/* TIME LIST */}
-            <div className="flex flex-wrap gap-2 mb-4">
+              <span className="text-xs text-gray-400">
+                {(availability[day] || []).length} slots
+              </span>
+            </div>
+
+            {/* TIME SLOTS */}
+            <div className="flex flex-wrap gap-2 mb-5">
               {(availability[day] || []).map((time: string, index: number) => (
                 <div
                   key={index}
-                  className="bg-blue-100 text-blue-800 px-3 py-1 rounded flex items-center gap-2"
+                  className="
+                      bg-blue-600/20
+                      text-blue-300
+                      px-3 py-1
+                      rounded-lg
+                      flex items-center gap-2
+                      text-sm
+                    "
                 >
                   {time}
 
                   <button
                     onClick={() => removeTime(day, index)}
-                    className="text-red-600 font-bold"
+                    className="text-red-400 hover:text-red-300 font-bold"
                   >
                     ✕
                   </button>
@@ -99,21 +126,42 @@ export default function AdminAvailabilityPage() {
             {/* ADD BUTTON */}
             <button
               onClick={() => addTime(day)}
-              className="bg-blue-600 text-white px-4 py-2 rounded"
+              className="
+                w-full
+                bg-blue-600
+                hover:bg-blue-700
+                text-white
+                py-2
+                rounded-lg
+                transition
+                text-sm
+                font-semibold
+              "
             >
-              Add Time
+              + Add Time
             </button>
           </div>
         ))}
       </div>
 
-      {/* SAVE */}
-      <button
-        onClick={saveAvailability}
-        className="mt-10 bg-green-600 text-white px-6 py-3 rounded"
-      >
-        Save Changes
-      </button>
+      {/* SAVE BUTTON */}
+      <div className="mt-12 text-center">
+        <button
+          onClick={saveAvailability}
+          className="
+            bg-green-600
+            hover:bg-green-700
+            text-white
+            px-8
+            py-3
+            rounded-lg
+            font-semibold
+            shadow
+          "
+        >
+          Save Changes
+        </button>
+      </div>
     </main>
   );
 }
