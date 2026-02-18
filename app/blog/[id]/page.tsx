@@ -1,21 +1,18 @@
 import PostClient from "./postclient";
-import { db } from "@/lib/firebase";
-import { doc, getDoc } from "firebase/firestore";
 
 /* ---------------- SEO ---------------- */
 export async function generateMetadata({ params }: any) {
-  const ref = doc(db, "blogPosts", params.id);
-  const snap = await getDoc(ref);
-
-  const post = snap.exists() ? snap.data() : null;
+  // Safety guard — prevents crash during build
+  if (!params?.id) {
+    return {
+      title: "Hypnotherapy Article | Aligned Minds",
+      description: "Read hypnotherapy insights and mental wellness guidance.",
+    };
+  }
 
   return {
-    title:
-      post?.seoTitle || post?.title || "Hypnotherapy Article | Aligned Minds",
-
-    description:
-      post?.seoDescription ||
-      "Read hypnotherapy insights and mental wellness guidance from Aligned Minds.",
+    title: "Hypnotherapy Article | Aligned Minds",
+    description: "Read hypnotherapy insights and mental wellness guidance.",
   };
 }
 
