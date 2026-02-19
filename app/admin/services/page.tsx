@@ -21,7 +21,6 @@ interface Service {
   image: string;
   active: boolean;
 
-  // ✅ SEO FIELDS
   seoTitle: string;
   seoDescription: string;
 }
@@ -36,12 +35,11 @@ export default function AdminServicesPage() {
     price: "",
     image: "",
     active: true,
-
     seoTitle: "",
     seoDescription: "",
   });
 
-  // 🔹 Fetch Services
+  /* ---------------- FETCH ---------------- */
   const fetchServices = async () => {
     const snapshot = await getDocs(collection(db, "services"));
 
@@ -57,7 +55,7 @@ export default function AdminServicesPage() {
     fetchServices();
   }, []);
 
-  // 🔹 Handle Input
+  /* ---------------- INPUT ---------------- */
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -67,7 +65,7 @@ export default function AdminServicesPage() {
     });
   };
 
-  // 🔹 Handle Image Upload
+  /* ---------------- IMAGE ---------------- */
   const handleImageUpload = (url: string) => {
     setForm({
       ...form,
@@ -75,7 +73,7 @@ export default function AdminServicesPage() {
     });
   };
 
-  // 🔹 Add / Update Service
+  /* ---------------- SUBMIT ---------------- */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -103,7 +101,7 @@ export default function AdminServicesPage() {
     fetchServices();
   };
 
-  // 🔹 Delete Service
+  /* ---------------- DELETE ---------------- */
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this service?")) return;
 
@@ -111,28 +109,39 @@ export default function AdminServicesPage() {
     fetchServices();
   };
 
-  // 🔹 Edit Service
+  /* ---------------- EDIT ---------------- */
   const handleEdit = (service: Service) => {
     setForm(service);
     setEditingId(service.id || null);
   };
 
   return (
-    <main className="p-10 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-10">Manage Services</h1>
+    <main className="p-6 md:p-10 max-w-6xl mx-auto text-white">
+      <h1 className="text-2xl md:text-3xl font-bold mb-8 md:mb-10">
+        Manage Services
+      </h1>
 
-      {/* =========================
-          FORM
-      ========================== */}
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4 mb-16">
-        <h2 className="text-xl font-semibold text-gray-700">Service Content</h2>
+      {/* ================= FORM ================= */}
+      <form
+        onSubmit={handleSubmit}
+        className="
+          bg-gray-900
+          border border-gray-800
+          rounded-2xl
+          p-5 md:p-6
+          flex flex-col gap-5
+          mb-14
+        "
+      >
+        {/* CONTENT */}
+        <h2 className="text-lg font-semibold text-blue-400">Service Content</h2>
 
         <input
           name="title"
           placeholder="Service Title"
           value={form.title}
           onChange={handleChange}
-          className="border p-3"
+          className="bg-gray-800 p-3 rounded w-full"
           required
         />
 
@@ -141,8 +150,8 @@ export default function AdminServicesPage() {
           placeholder="Service Description"
           value={form.description}
           onChange={handleChange}
-          className="border p-3"
           rows={4}
+          className="bg-gray-800 p-3 rounded w-full"
           required
         />
 
@@ -151,7 +160,7 @@ export default function AdminServicesPage() {
           placeholder="Price (ex: $150)"
           value={form.price}
           onChange={handleChange}
-          className="border p-3"
+          className="bg-gray-800 p-3 rounded w-full"
           required
         />
 
@@ -166,78 +175,99 @@ export default function AdminServicesPage() {
             <button
               type="button"
               onClick={() => open()}
-              className="bg-purple-600 text-white p-3 rounded"
+              className="bg-purple-600 hover:bg-purple-700 transition p-3 rounded"
             >
               Upload Service Image
             </button>
           )}
         </CldUploadWidget>
 
+        {/* IMAGE PREVIEW */}
         {form.image && (
-          <div className="relative w-48 h-32 mt-2">
-            <img
-              src={form.image}
-              alt="Preview"
-              className="object-cover rounded border"
-            />
-          </div>
+          <img
+            src={form.image}
+            alt="Preview"
+            className="
+              w-full
+              max-w-sm
+              h-48
+              object-cover
+              rounded-lg
+              border
+              border-gray-700
+            "
+          />
         )}
 
-        {/* =========================
-            SEO SECTION
-        ========================== */}
+        {/* ================= SEO ================= */}
+        <div className="border border-gray-800 rounded-xl p-4 mt-4">
+          <h2 className="text-lg font-semibold text-blue-400 mb-3">
+            Service SEO
+          </h2>
 
-        <h2 className="text-xl font-semibold text-gray-700 mt-6">
-          Service SEO
-        </h2>
+          <input
+            name="seoTitle"
+            placeholder="SEO Title (Google Page Title)"
+            value={form.seoTitle}
+            onChange={handleChange}
+            className="bg-gray-800 p-3 rounded w-full mb-3"
+          />
 
-        <input
-          name="seoTitle"
-          placeholder="SEO Title (Google Page Title)"
-          value={form.seoTitle}
-          onChange={handleChange}
-          className="border p-3"
-        />
+          <textarea
+            name="seoDescription"
+            placeholder="SEO Meta Description"
+            value={form.seoDescription}
+            onChange={handleChange}
+            rows={3}
+            className="bg-gray-800 p-3 rounded w-full"
+          />
+        </div>
 
-        <textarea
-          name="seoDescription"
-          placeholder="SEO Meta Description"
-          value={form.seoDescription}
-          onChange={handleChange}
-          rows={3}
-          className="border p-3"
-        />
-
-        <button className="bg-blue-600 text-white p-3 rounded">
+        <button className="bg-blue-600 hover:bg-blue-700 transition p-3 rounded font-semibold">
           {editingId ? "Update Service" : "Add Service"}
         </button>
       </form>
 
-      {/* =========================
-          SERVICE LIST
-      ========================== */}
-
-      <div className="grid md:grid-cols-2 gap-6">
+      {/* ================= SERVICES LIST ================= */}
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {services.map((service) => (
           <div
             key={service.id}
-            className="border p-4 rounded-lg flex flex-col gap-2"
+            className="
+              bg-gray-900
+              border border-gray-800
+              rounded-2xl
+              p-5
+              flex flex-col
+              gap-3
+            "
           >
+            {/* IMAGE */}
+            {service.image && (
+              <img
+                src={service.image}
+                alt={service.title}
+                className="w-full h-40 object-cover rounded-lg"
+              />
+            )}
+
+            {/* INFO */}
             <h2 className="font-semibold text-lg">{service.title}</h2>
 
-            <p className="text-sm text-gray-600">{service.price}</p>
+            <p className="text-blue-400 font-semibold">{service.price}</p>
 
+            {/* ACTIONS */}
             <div className="flex gap-3 mt-2">
               <button
                 onClick={() => handleEdit(service)}
-                className="bg-yellow-500 text-white px-3 py-1 rounded"
+                className="bg-yellow-500 px-3 py-1 rounded text-sm"
               >
                 Edit
               </button>
 
               <button
                 onClick={() => handleDelete(service.id!)}
-                className="bg-red-600 text-white px-3 py-1 rounded"
+                className="bg-red-600 px-3 py-1 rounded text-sm"
               >
                 Delete
               </button>

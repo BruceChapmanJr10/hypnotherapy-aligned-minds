@@ -17,11 +17,8 @@ interface Post {
   title: string;
   content: string;
   image: string;
-
-  // 🔥 NEW SEO FIELDS
   seoTitle: string;
   seoDescription: string;
-
   createdAt?: any;
 }
 
@@ -37,7 +34,7 @@ export default function AdminBlogPage() {
     seoDescription: "",
   });
 
-  /* ---------------- FETCH POSTS ---------------- */
+  /* ---------------- FETCH ---------------- */
   const fetchPosts = async () => {
     const snapshot = await getDocs(collection(db, "blogPosts"));
 
@@ -105,107 +102,185 @@ export default function AdminBlogPage() {
   const handleEdit = (post: Post) => {
     setForm(post);
     setEditingId(post.id || null);
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
-    <main className="p-10 max-w-5xl mx-auto text-white">
-      <h1 className="text-3xl font-bold mb-10">Blog Manager</h1>
+    <main className="p-6 md:p-10 max-w-6xl mx-auto text-white">
+      {/* PAGE TITLE */}
+      <h1 className="text-2xl md:text-3xl font-bold mb-8 md:mb-10">
+        Blog Manager
+      </h1>
 
-      {/* ---------------- FORM ---------------- */}
-      <form onSubmit={handleSubmit} className="flex flex-col gap-4 mb-16">
+      {/* ================= FORM ================= */}
+      <form
+        onSubmit={handleSubmit}
+        className="
+          flex flex-col gap-4
+          bg-gray-900
+          p-5 md:p-6
+          rounded-2xl
+          border border-gray-800
+          mb-12
+        "
+      >
         {/* TITLE */}
         <div>
-          <label className="block text-sm mb-1">Post Title</label>
+          <label className="block text-sm mb-1 text-gray-300">Post Title</label>
+
           <input
             name="title"
             placeholder="Post Title"
             value={form.title}
             onChange={handleChange}
-            className="bg-gray-800 p-3 rounded w-full"
+            className="bg-gray-800 p-3 rounded w-full text-sm md:text-base"
             required
           />
         </div>
 
         {/* IMAGE */}
         <div>
-          <label className="block text-sm mb-1">Image URL</label>
+          <label className="block text-sm mb-1 text-gray-300">Image URL</label>
+
           <input
             name="image"
             placeholder="Image URL"
             value={form.image}
             onChange={handleChange}
-            className="bg-gray-800 p-3 rounded w-full"
+            className="bg-gray-800 p-3 rounded w-full text-sm md:text-base"
           />
         </div>
 
         {/* CONTENT */}
         <div>
-          <label className="block text-sm mb-1">Post Content</label>
+          <label className="block text-sm mb-1 text-gray-300">
+            Post Content
+          </label>
+
           <textarea
             name="content"
             placeholder="Post content..."
             value={form.content}
             onChange={handleChange}
             rows={6}
-            className="bg-gray-800 p-3 rounded w-full"
+            className="bg-gray-800 p-3 rounded w-full text-sm md:text-base"
             required
           />
         </div>
 
-        {/* ---------------- SEO SECTION ---------------- */}
-        <div className="border border-gray-700 rounded-lg p-4 mt-4">
+        {/* ================= SEO ================= */}
+        <div className="border border-gray-700 rounded-xl p-4 mt-2">
           <h2 className="font-semibold mb-4 text-lg text-blue-400">
             SEO Settings
           </h2>
 
           {/* SEO TITLE */}
           <div className="mb-3">
-            <label className="block text-sm mb-1">SEO Title</label>
+            <label className="block text-sm mb-1 text-gray-300">
+              SEO Title
+            </label>
+
             <input
               name="seoTitle"
               placeholder="How Hypnotherapy Helps Anxiety | Aligned Minds"
               value={form.seoTitle}
               onChange={handleChange}
-              className="bg-gray-800 p-3 rounded w-full"
+              className="bg-gray-800 p-3 rounded w-full text-sm md:text-base"
             />
           </div>
 
           {/* SEO DESCRIPTION */}
           <div>
-            <label className="block text-sm mb-1">SEO Meta Description</label>
+            <label className="block text-sm mb-1 text-gray-300">
+              SEO Meta Description
+            </label>
+
             <textarea
               name="seoDescription"
               placeholder="Discover how hypnotherapy can reduce anxiety and stress naturally."
               value={form.seoDescription}
               onChange={handleChange}
               rows={3}
-              className="bg-gray-800 p-3 rounded w-full"
+              className="bg-gray-800 p-3 rounded w-full text-sm md:text-base"
             />
           </div>
         </div>
 
-        <button className="bg-blue-600 py-3 rounded">
+        {/* SUBMIT */}
+        <button
+          className="
+            bg-blue-600
+            hover:bg-blue-700
+            transition
+            py-3
+            rounded-lg
+            font-semibold
+            mt-2
+          "
+        >
           {editingId ? "Update Post" : "Add Post"}
         </button>
       </form>
 
-      {/* ---------------- POSTS LIST ---------------- */}
-      <div className="grid gap-6">
+      {/* ================= POSTS LIST ================= */}
+      <div
+        className="
+          grid
+          grid-cols-1
+          sm:grid-cols-2
+          lg:grid-cols-3
+          gap-6
+        "
+      >
         {posts.map((post) => (
-          <div key={post.id} className="bg-gray-900 p-6 rounded-xl">
-            <h2 className="font-bold">{post.title}</h2>
+          <div
+            key={post.id}
+            className="
+              bg-gray-900
+              p-5
+              rounded-2xl
+              border border-gray-800
+              flex flex-col
+              justify-between
+            "
+          >
+            <div>
+              <h2 className="font-bold text-lg mb-2">{post.title}</h2>
 
-            <div className="flex gap-3 mt-3">
+              {post.seoTitle && (
+                <p className="text-xs text-gray-400">SEO: {post.seoTitle}</p>
+              )}
+            </div>
+
+            {/* ACTIONS */}
+            <div className="flex gap-3 mt-4">
               <button
                 onClick={() => handleEdit(post)}
-                className="bg-yellow-500 px-3 py-1 rounded"
+                className="
+                  flex-1
+                  bg-yellow-500
+                  hover:bg-yellow-600
+                  px-3 py-2
+                  rounded
+                  text-sm
+                  font-semibold
+                "
               >
                 Edit
               </button>
 
               <button
                 onClick={() => handleDelete(post.id!)}
-                className="bg-red-600 px-3 py-1 rounded"
+                className="
+                  flex-1
+                  bg-red-600
+                  hover:bg-red-700
+                  px-3 py-2
+                  rounded
+                  text-sm
+                  font-semibold
+                "
               >
                 Delete
               </button>

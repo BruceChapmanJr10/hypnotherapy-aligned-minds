@@ -15,7 +15,7 @@ export default function AdminFooterPage() {
 
   const [loading, setLoading] = useState(true);
 
-  // Fetch footer content
+  /* ---------------- FETCH ---------------- */
   useEffect(() => {
     const fetchData = async () => {
       const ref = doc(db, "content", "footer");
@@ -31,7 +31,7 @@ export default function AdminFooterPage() {
     fetchData();
   }, []);
 
-  //  Handle input
+  /* ---------------- INPUT ---------------- */
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -41,68 +41,126 @@ export default function AdminFooterPage() {
     });
   };
 
-  // Save
+  /* ---------------- SAVE ---------------- */
   const handleSave = async () => {
     const ref = doc(db, "content", "footer");
-
     await setDoc(ref, form);
 
     alert("Footer updated!");
   };
 
-  if (loading) return <p className="p-10">Loading...</p>;
+  if (loading) {
+    return <p className="p-6 md:p-10 text-gray-400">Loading footer...</p>;
+  }
 
   return (
-    <main className="p-10 max-w-4xl mx-auto">
-      <h1 className="text-3xl font-bold mb-10">Edit Footer</h1>
+    <main className="p-6 md:p-10 max-w-4xl mx-auto text-white">
+      {/* TITLE */}
+      <h1 className="text-2xl md:text-3xl font-bold mb-8 md:mb-10">
+        Footer Editor
+      </h1>
 
-      <div className="flex flex-col gap-6">
-        <input
-          name="businessName"
-          placeholder="Business Name"
-          value={form.businessName}
-          onChange={handleChange}
-          className="border p-3 rounded"
-        />
+      {/* FORM CARD */}
+      <div
+        className="
+          bg-gray-900
+          border border-gray-800
+          rounded-2xl
+          p-5 md:p-6
+          flex flex-col gap-5
+        "
+      >
+        {/* BUSINESS NAME */}
+        <div>
+          <label className="block text-sm text-gray-300 mb-1">
+            Business Name
+          </label>
 
-        <textarea
-          name="description"
-          placeholder="Description"
-          value={form.description}
-          onChange={handleChange}
-          rows={3}
-          className="border p-3 rounded"
-        />
+          <input
+            name="businessName"
+            placeholder="Aligned Minds Hypnotherapy"
+            value={form.businessName}
+            onChange={handleChange}
+            className="bg-gray-800 p-3 rounded w-full text-sm md:text-base"
+          />
+        </div>
 
-        <input
-          name="phone"
-          placeholder="Phone"
-          value={form.phone}
-          onChange={handleChange}
-          className="border p-3 rounded"
-        />
+        {/* DESCRIPTION */}
+        <div>
+          <label className="block text-sm text-gray-300 mb-1">
+            Footer Description
+          </label>
 
-        <input
-          name="email"
-          placeholder="Email"
-          value={form.email}
-          onChange={handleChange}
-          className="border p-3 rounded"
-        />
+          <textarea
+            name="description"
+            placeholder="Helping you achieve mental clarity..."
+            value={form.description}
+            onChange={handleChange}
+            rows={3}
+            className="bg-gray-800 p-3 rounded w-full text-sm md:text-base"
+          />
+        </div>
 
-        <input
-          name="address"
-          placeholder="Address"
-          value={form.address}
-          onChange={handleChange}
-          className="border p-3 rounded"
-        />
+        {/* PHONE */}
+        <div>
+          <label className="block text-sm text-gray-300 mb-1">
+            Phone Number
+          </label>
 
+          <input
+            name="phone"
+            placeholder="(540) 000-0000"
+            value={form.phone}
+            onChange={handleChange}
+            className="bg-gray-800 p-3 rounded w-full text-sm md:text-base"
+          />
+        </div>
+
+        {/* EMAIL */}
+        <div>
+          <label className="block text-sm text-gray-300 mb-1">
+            Business Email
+          </label>
+
+          <input
+            name="email"
+            placeholder="info@alignedminds.com"
+            value={form.email}
+            onChange={handleChange}
+            className="bg-gray-800 p-3 rounded w-full text-sm md:text-base"
+          />
+        </div>
+
+        {/* ADDRESS */}
+        <div>
+          <label className="block text-sm text-gray-300 mb-1">
+            Business Address
+          </label>
+
+          <input
+            name="address"
+            placeholder="Winchester, VA"
+            value={form.address}
+            onChange={handleChange}
+            className="bg-gray-800 p-3 rounded w-full text-sm md:text-base"
+          />
+        </div>
+
+        {/* SAVE BUTTON */}
         <button
           onClick={handleSave}
-          className="bg-blue-900 text-white py-3 rounded"
+          className="
+            bg-blue-600
+            hover:bg-blue-700
+            transition
+            text-white
+            py-3
+            rounded-lg
+            font-semibold
+            mt-2
+          "
         >
-          Save Footer
+          Save Footer Changes
         </button>
       </div>
     </main>
