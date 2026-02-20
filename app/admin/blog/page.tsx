@@ -12,6 +12,8 @@ import {
   Timestamp,
 } from "firebase/firestore";
 
+import { CldUploadWidget } from "next-cloudinary";
+
 interface Post {
   id?: string;
   title: string;
@@ -60,6 +62,14 @@ export default function AdminBlogPage() {
     });
   };
 
+  /* ---------------- IMAGE UPLOAD ---------------- */
+  const handleImageUpload = (url: string) => {
+    setForm({
+      ...form,
+      image: url,
+    });
+  };
+
   /* ---------------- ADD / UPDATE ---------------- */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,13 +112,11 @@ export default function AdminBlogPage() {
   const handleEdit = (post: Post) => {
     setForm(post);
     setEditingId(post.id || null);
-
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
     <main className="p-6 md:p-10 max-w-6xl mx-auto text-white">
-      {/* PAGE TITLE */}
       <h1 className="text-2xl md:text-3xl font-bold mb-8 md:mb-10">
         Blog Manager
       </h1>
@@ -131,25 +139,56 @@ export default function AdminBlogPage() {
 
           <input
             name="title"
-            placeholder="Post Title"
             value={form.title}
             onChange={handleChange}
-            className="bg-gray-800 p-3 rounded w-full text-sm md:text-base"
+            className="bg-gray-800 p-3 rounded w-full"
             required
           />
         </div>
 
-        {/* IMAGE */}
+        {/* IMAGE UPLOAD */}
         <div>
-          <label className="block text-sm mb-1 text-gray-300">Image URL</label>
+          <label className="block text-sm mb-2 text-gray-300">Blog Image</label>
 
-          <input
-            name="image"
-            placeholder="Image URL"
-            value={form.image}
-            onChange={handleChange}
-            className="bg-gray-800 p-3 rounded w-full text-sm md:text-base"
-          />
+          <CldUploadWidget
+            uploadPreset="aligned_minds_unsigned"
+            onSuccess={(result: any) => {
+              handleImageUpload(result.info.secure_url);
+            }}
+          >
+            {({ open }) => (
+              <button
+                type="button"
+                onClick={() => open()}
+                className="
+                  bg-purple-600
+                  hover:bg-purple-700
+                  transition
+                  py-3
+                  rounded-lg
+                  w-full
+                "
+              >
+                Upload Image
+              </button>
+            )}
+          </CldUploadWidget>
+
+          {/* PREVIEW */}
+          {form.image && (
+            <img
+              src={form.image}
+              alt="Preview"
+              className="
+                w-full
+                h-48
+                object-cover
+                rounded-lg
+                mt-3
+                border border-gray-700
+              "
+            />
+          )}
         </div>
 
         {/* CONTENT */}
@@ -160,79 +199,45 @@ export default function AdminBlogPage() {
 
           <textarea
             name="content"
-            placeholder="Post content..."
             value={form.content}
             onChange={handleChange}
             rows={6}
-            className="bg-gray-800 p-3 rounded w-full text-sm md:text-base"
+            className="bg-gray-800 p-3 rounded w-full"
             required
           />
         </div>
 
-        {/* ================= SEO ================= */}
+        {/* SEO */}
         <div className="border border-gray-700 rounded-xl p-4 mt-2">
           <h2 className="font-semibold mb-4 text-lg text-blue-400">
             SEO Settings
           </h2>
 
-          {/* SEO TITLE */}
-          <div className="mb-3">
-            <label className="block text-sm mb-1 text-gray-300">
-              SEO Title
-            </label>
+          <input
+            name="seoTitle"
+            placeholder="SEO Title"
+            value={form.seoTitle}
+            onChange={handleChange}
+            className="bg-gray-800 p-3 rounded w-full mb-3"
+          />
 
-            <input
-              name="seoTitle"
-              placeholder="How Hypnotherapy Helps Anxiety | Aligned Minds"
-              value={form.seoTitle}
-              onChange={handleChange}
-              className="bg-gray-800 p-3 rounded w-full text-sm md:text-base"
-            />
-          </div>
-
-          {/* SEO DESCRIPTION */}
-          <div>
-            <label className="block text-sm mb-1 text-gray-300">
-              SEO Meta Description
-            </label>
-
-            <textarea
-              name="seoDescription"
-              placeholder="Discover how hypnotherapy can reduce anxiety and stress naturally."
-              value={form.seoDescription}
-              onChange={handleChange}
-              rows={3}
-              className="bg-gray-800 p-3 rounded w-full text-sm md:text-base"
-            />
-          </div>
+          <textarea
+            name="seoDescription"
+            placeholder="SEO Meta Description"
+            value={form.seoDescription}
+            onChange={handleChange}
+            rows={3}
+            className="bg-gray-800 p-3 rounded w-full"
+          />
         </div>
 
-        {/* SUBMIT */}
-        <button
-          className="
-            bg-blue-600
-            hover:bg-blue-700
-            transition
-            py-3
-            rounded-lg
-            font-semibold
-            mt-2
-          "
-        >
+        <button className="bg-blue-600 hover:bg-blue-700 py-3 rounded-lg">
           {editingId ? "Update Post" : "Add Post"}
         </button>
       </form>
 
-      {/* ================= POSTS LIST ================= */}
-      <div
-        className="
-          grid
-          grid-cols-1
-          sm:grid-cols-2
-          lg:grid-cols-3
-          gap-6
-        "
-      >
+      {/* ================= POSTS ================= */}
+      <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {posts.map((post) => (
           <div
             key={post.id}
@@ -241,46 +246,28 @@ export default function AdminBlogPage() {
               p-5
               rounded-2xl
               border border-gray-800
-              flex flex-col
-              justify-between
             "
           >
-            <div>
-              <h2 className="font-bold text-lg mb-2">{post.title}</h2>
+            <h2 className="font-bold">{post.title}</h2>
 
-              {post.seoTitle && (
-                <p className="text-xs text-gray-400">SEO: {post.seoTitle}</p>
-              )}
-            </div>
+            {post.image && (
+              <img
+                src={post.image}
+                className="h-32 w-full object-cover rounded mt-3"
+              />
+            )}
 
-            {/* ACTIONS */}
             <div className="flex gap-3 mt-4">
               <button
                 onClick={() => handleEdit(post)}
-                className="
-                  flex-1
-                  bg-yellow-500
-                  hover:bg-yellow-600
-                  px-3 py-2
-                  rounded
-                  text-sm
-                  font-semibold
-                "
+                className="flex-1 bg-yellow-500 py-2 rounded"
               >
                 Edit
               </button>
 
               <button
                 onClick={() => handleDelete(post.id!)}
-                className="
-                  flex-1
-                  bg-red-600
-                  hover:bg-red-700
-                  px-3 py-2
-                  rounded
-                  text-sm
-                  font-semibold
-                "
+                className="flex-1 bg-red-600 py-2 rounded"
               >
                 Delete
               </button>
