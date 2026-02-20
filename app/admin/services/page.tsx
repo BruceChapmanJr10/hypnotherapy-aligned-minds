@@ -13,6 +13,8 @@ import {
 
 import { CldUploadWidget } from "next-cloudinary";
 
+/* ================= TYPES ================= */
+
 interface Service {
   id?: string;
   title: string;
@@ -20,10 +22,11 @@ interface Service {
   price: string;
   image: string;
   active: boolean;
-
   seoTitle: string;
   seoDescription: string;
 }
+
+/* ================= PAGE ================= */
 
 export default function AdminServicesPage() {
   const [services, setServices] = useState<Service[]>([]);
@@ -39,23 +42,36 @@ export default function AdminServicesPage() {
     seoDescription: "",
   });
 
-  /* ---------------- FETCH ---------------- */
+  /* ================= FETCH ================= */
+
   const fetchServices = async () => {
     const snapshot = await getDocs(collection(db, "services"));
 
-    const data = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...(doc.data() as Service),
-    }));
+    // 🔥 Normalize old docs so fields are never undefined
+    const data = snapshot.docs.map((docSnap) => {
+      const service = docSnap.data() as Partial<Service>;
 
-    setServices(data);
+      return {
+        id: docSnap.id,
+        title: service.title || "",
+        description: service.description || "",
+        price: service.price || "",
+        image: service.image || "",
+        active: service.active ?? true,
+        seoTitle: service.seoTitle || "",
+        seoDescription: service.seoDescription || "",
+      };
+    });
+
+    setServices(data as Service[]);
   };
 
   useEffect(() => {
     fetchServices();
   }, []);
 
-  /* ---------------- INPUT ---------------- */
+  /* ================= INPUT ================= */
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -65,7 +81,8 @@ export default function AdminServicesPage() {
     });
   };
 
-  /* ---------------- IMAGE ---------------- */
+  /* ================= IMAGE ================= */
+
   const handleImageUpload = (url: string) => {
     setForm({
       ...form,
@@ -73,7 +90,8 @@ export default function AdminServicesPage() {
     });
   };
 
-  /* ---------------- SUBMIT ---------------- */
+  /* ================= SUBMIT ================= */
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -88,6 +106,7 @@ export default function AdminServicesPage() {
       alert("Service added!");
     }
 
+    // Reset form
     setForm({
       title: "",
       description: "",
@@ -101,7 +120,8 @@ export default function AdminServicesPage() {
     fetchServices();
   };
 
-  /* ---------------- DELETE ---------------- */
+  /* ================= DELETE ================= */
+
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this service?")) return;
 
@@ -109,14 +129,32 @@ export default function AdminServicesPage() {
     fetchServices();
   };
 
-  /* ---------------- EDIT ---------------- */
+  /* ================= EDIT ================= */
+
   const handleEdit = (service: Service) => {
-    setForm(service);
+    // 🔥 Prevent undefined fields
+    setForm({
+      id: service.id,
+      title: service.title || "",
+      description: service.description || "",
+      price: service.price || "",
+      image: service.image || "",
+      active: service.active ?? true,
+      seoTitle: service.seoTitle || "",
+      seoDescription: service.seoDescription || "",
+    });
+
     setEditingId(service.id || null);
+
+    // Scroll to form
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
+
+  /* ================= UI ================= */
 
   return (
     <main className="p-6 md:p-10 max-w-6xl mx-auto text-white">
+      {/* TITLE */}
       <h1 className="text-2xl md:text-3xl font-bold mb-8 md:mb-10">
         Manage Services
       </h1>
@@ -133,7 +171,7 @@ export default function AdminServicesPage() {
           mb-14
         "
       >
-        {/* CONTENT */}
+        {/* -------- CONTENT -------- */}
         <h2 className="text-lg font-semibold text-blue-400">Service Content</h2>
 
         <input
@@ -164,23 +202,37 @@ export default function AdminServicesPage() {
           required
         />
 
-        {/* IMAGE UPLOAD */}
-        <CldUploadWidget
-          uploadPreset="aligned_minds_unsigned"
-          onSuccess={(result: any) => {
-            handleImageUpload(result.info.secure_url);
-          }}
-        >
-          {({ open }) => (
-            <button
-              type="button"
-              onClick={() => open()}
-              className="bg-purple-600 hover:bg-purple-700 transition p-3 rounded"
-            >
-              Upload Service Image
-            </button>
-          )}
-        </CldUploadWidget>
+        {/* -------- IMAGE UPLOAD -------- */}
+        <div>
+          <label className="text-sm text-gray-300 block mb-2">
+            Service Image
+          </label>
+
+          <CldUploadWidget
+            uploadPreset="aligned_minds_unsigned"
+            onSuccess={(result: any) => {
+              handleImageUpload(result.info.secure_url);
+            }}
+          >
+            {({ open }) => (
+              <button
+                type="button"
+                onClick={() => open()}
+                className="
+                  bg-purple-600
+                  hover:bg-purple-700
+                  transition
+                  p-3
+                  rounded
+                  w-full
+                  font-semibold
+                "
+              >
+                Upload Image
+              </button>
+            )}
+          </CldUploadWidget>
+        </div>
 
         {/* IMAGE PREVIEW */}
         {form.image && (
@@ -199,7 +251,7 @@ export default function AdminServicesPage() {
           />
         )}
 
-        {/* ================= SEO ================= */}
+        {/* -------- SEO -------- */}
         <div className="border border-gray-800 rounded-xl p-4 mt-4">
           <h2 className="text-lg font-semibold text-blue-400 mb-3">
             Service SEO
@@ -223,7 +275,16 @@ export default function AdminServicesPage() {
           />
         </div>
 
-        <button className="bg-blue-600 hover:bg-blue-700 transition p-3 rounded font-semibold">
+        <button
+          className="
+            bg-blue-600
+            hover:bg-blue-700
+            transition
+            p-3
+            rounded
+            font-semibold
+          "
+        >
           {editingId ? "Update Service" : "Add Service"}
         </button>
       </form>
