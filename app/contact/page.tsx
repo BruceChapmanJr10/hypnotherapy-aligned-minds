@@ -67,15 +67,29 @@ export default function ContactClient() {
         )}
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {/* NAME */}
           <input
             name="name"
             placeholder="Your Name"
             value={form.name}
             onChange={handleChange}
             required
-            className="bg-gray-50 border border-gray-200 p-3 rounded-lg"
+            className="
+              bg-white
+              border border-gray-300
+              p-3
+              rounded-lg
+              text-gray-900
+              placeholder-gray-500
+              focus:outline-none
+              focus:ring-2
+              focus:ring-blue-300
+              focus:border-blue-400
+              transition
+            "
           />
 
+          {/* EMAIL */}
           <input
             name="email"
             type="email"
@@ -83,9 +97,22 @@ export default function ContactClient() {
             value={form.email}
             onChange={handleChange}
             required
-            className="bg-gray-50 border border-gray-200 p-3 rounded-lg"
+            className="
+              bg-white
+              border border-gray-300
+              p-3
+              rounded-lg
+              text-gray-900
+              placeholder-gray-500
+              focus:outline-none
+              focus:ring-2
+              focus:ring-blue-300
+              focus:border-blue-400
+              transition
+            "
           />
 
+          {/* MESSAGE */}
           <textarea
             name="message"
             placeholder="Your Message..."
@@ -93,13 +120,26 @@ export default function ContactClient() {
             onChange={handleChange}
             rows={5}
             required
-            className="bg-gray-50 border border-gray-200 p-3 rounded-lg"
+            className="
+              bg-white
+              border border-gray-300
+              p-3
+              rounded-lg
+              text-gray-900
+              placeholder-gray-500
+              focus:outline-none
+              focus:ring-2
+              focus:ring-blue-300
+              focus:border-blue-400
+              transition
+            "
           />
 
+          {/* SUBMIT BUTTON */}
           <button
             type="submit"
             disabled={loading}
-            className="bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition mt-2"
+            className="bg-blue-600 hover:bg-blue-700 text-white py-3 rounded-lg font-semibold transition mt-2 shadow-sm"
           >
             {loading ? "Sending..." : "Send Message"}
           </button>
