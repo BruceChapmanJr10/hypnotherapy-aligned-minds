@@ -3,12 +3,15 @@
 import { useState } from "react";
 import BookingModal from "@/components/BookingModal";
 
-export default function BookingPage() {
+/* ---------------- BOOKING PAGE CLIENT ---------------- */
+/* Handles booking modal interaction and UI rendering */
+
+export default function BookingClient() {
   const [openBooking, setOpenBooking] = useState(true);
 
   return (
     <main className="min-h-screen flex items-center justify-center bg-blue-50 px-6">
-      {/* Optional intro content */}
+      {/* PAGE INTRO */}
       <div className="text-center">
         <h1 className="text-4xl font-bold text-blue-900 mb-4">
           Book Your Appointment
@@ -19,7 +22,7 @@ export default function BookingPage() {
         </p>
       </div>
 
-      {/* Booking Modal */}
+      {/* BOOKING MODAL */}
       <BookingModal
         isOpen={openBooking}
         onClose={() => setOpenBooking(false)}

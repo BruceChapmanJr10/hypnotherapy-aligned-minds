@@ -6,6 +6,8 @@ import Image from "next/image";
 import { db } from "@/lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
 
+/* ---------------- BLOG POST TYPE ---------------- */
+/* Represents summary data for blog listing */
 interface Post {
   id: string;
   title: string;
@@ -15,15 +17,17 @@ interface Post {
 export default function BlogClient() {
   const [posts, setPosts] = useState<Post[]>([]);
 
+  /* ---------------- FETCH BLOG POSTS ---------------- */
+  /* Retrieves blog post summaries for listing page */
   useEffect(() => {
     const fetchPosts = async () => {
       const snapshot = await getDocs(collection(db, "blogPosts"));
 
-      const data: Post[] = snapshot.docs.map((doc) => {
-        const postData = doc.data() as Omit<Post, "id">;
+      const data: Post[] = snapshot.docs.map((docSnap) => {
+        const postData = docSnap.data() as Omit<Post, "id">;
 
         return {
-          id: doc.id,
+          id: docSnap.id,
           ...postData,
         };
       });

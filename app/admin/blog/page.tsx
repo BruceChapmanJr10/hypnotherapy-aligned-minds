@@ -11,9 +11,10 @@ import {
   updateDoc,
   Timestamp,
 } from "firebase/firestore";
-
 import { CldUploadWidget } from "next-cloudinary";
 
+/* ---------------- BLOG POST TYPE ---------------- */
+/* Each post maintains its own SEO metadata */
 interface Post {
   id?: string;
   title: string;
@@ -28,6 +29,8 @@ export default function AdminBlogPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [editingId, setEditingId] = useState<string | null>(null);
 
+  /* ---------------- FORM STATE ---------------- */
+  /* Includes per-post SEO fields */
   const [form, setForm] = useState<Post>({
     title: "",
     content: "",
@@ -36,13 +39,13 @@ export default function AdminBlogPage() {
     seoDescription: "",
   });
 
-  /* ---------------- FETCH ---------------- */
+  /* ---------------- FETCH POSTS ---------------- */
   const fetchPosts = async () => {
     const snapshot = await getDocs(collection(db, "blogPosts"));
 
-    const data = snapshot.docs.map((doc) => ({
-      id: doc.id,
-      ...(doc.data() as Post),
+    const data = snapshot.docs.map((docSnap) => ({
+      id: docSnap.id,
+      ...(docSnap.data() as Post),
     }));
 
     setPosts(data);
@@ -52,7 +55,7 @@ export default function AdminBlogPage() {
     fetchPosts();
   }, []);
 
-  /* ---------------- INPUT ---------------- */
+  /* ---------------- FORM INPUT HANDLER ---------------- */
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -70,17 +73,22 @@ export default function AdminBlogPage() {
     });
   };
 
-  /* ---------------- ADD / UPDATE ---------------- */
+  /* ---------------- ADD / UPDATE POST ---------------- */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     const { id, ...postData } = form;
 
     if (editingId) {
-      await updateDoc(doc(db, "blogPosts", editingId), postData);
+      /* Update existing post */
+      await updateDoc(doc(db, "blogPosts", editingId), {
+        ...postData,
+      });
+
       alert("Post updated!");
       setEditingId(null);
     } else {
+      /* Create new post */
       await addDoc(collection(db, "blogPosts"), {
         ...postData,
         createdAt: Timestamp.now(),
@@ -89,6 +97,7 @@ export default function AdminBlogPage() {
       alert("Post added!");
     }
 
+    /* Reset form */
     setForm({
       title: "",
       content: "",
@@ -100,7 +109,7 @@ export default function AdminBlogPage() {
     fetchPosts();
   };
 
-  /* ---------------- DELETE ---------------- */
+  /* ---------------- DELETE POST ---------------- */
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this post?")) return;
 
@@ -108,7 +117,7 @@ export default function AdminBlogPage() {
     fetchPosts();
   };
 
-  /* ---------------- EDIT ---------------- */
+  /* ---------------- EDIT POST ---------------- */
   const handleEdit = (post: Post) => {
     setForm(post);
     setEditingId(post.id || null);
@@ -121,19 +130,12 @@ export default function AdminBlogPage() {
         Blog Manager
       </h1>
 
-      {/* ================= FORM ================= */}
+      {/* ================= CREATE / EDIT FORM ================= */}
       <form
         onSubmit={handleSubmit}
-        className="
-          flex flex-col gap-4
-          bg-gray-900
-          p-5 md:p-6
-          rounded-2xl
-          border border-gray-800
-          mb-12
-        "
+        className="flex flex-col gap-4 bg-gray-900 p-5 md:p-6 rounded-2xl border border-gray-800 mb-12"
       >
-        {/* TITLE */}
+        {/* POST TITLE */}
         <div>
           <label className="block text-sm mb-1 text-gray-300">Post Title</label>
 
@@ -160,38 +162,23 @@ export default function AdminBlogPage() {
               <button
                 type="button"
                 onClick={() => open()}
-                className="
-                  bg-purple-600
-                  hover:bg-purple-700
-                  transition
-                  py-3
-                  rounded-lg
-                  w-full
-                "
+                className="bg-purple-600 hover:bg-purple-700 transition py-3 rounded-lg w-full"
               >
                 Upload Image
               </button>
             )}
           </CldUploadWidget>
 
-          {/* PREVIEW */}
           {form.image && (
             <img
               src={form.image}
               alt="Preview"
-              className="
-                w-full
-                h-48
-                object-cover
-                rounded-lg
-                mt-3
-                border border-gray-700
-              "
+              className="w-full h-48 object-cover rounded-lg mt-3 border border-gray-700"
             />
           )}
         </div>
 
-        {/* CONTENT */}
+        {/* POST CONTENT */}
         <div>
           <label className="block text-sm mb-1 text-gray-300">
             Post Content
@@ -207,10 +194,10 @@ export default function AdminBlogPage() {
           />
         </div>
 
-        {/* SEO */}
+        {/* PER-POST SEO */}
         <div className="border border-gray-700 rounded-xl p-4 mt-2">
           <h2 className="font-semibold mb-4 text-lg text-blue-400">
-            SEO Settings
+            SEO Settings (Per Post)
           </h2>
 
           <input
@@ -236,23 +223,19 @@ export default function AdminBlogPage() {
         </button>
       </form>
 
-      {/* ================= POSTS ================= */}
+      {/* ================= POST LIST ================= */}
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {posts.map((post) => (
           <div
             key={post.id}
-            className="
-              bg-gray-900
-              p-5
-              rounded-2xl
-              border border-gray-800
-            "
+            className="bg-gray-900 p-5 rounded-2xl border border-gray-800"
           >
             <h2 className="font-bold">{post.title}</h2>
 
             {post.image && (
               <img
                 src={post.image}
+                alt={post.title}
                 className="h-32 w-full object-cover rounded mt-3"
               />
             )}

@@ -5,9 +5,15 @@ import Image from "next/image";
 import { db } from "../lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 
+/* ---------------- ABOUT SECTION COMPONENT ---------------- */
+/* Displays About content pulled from Firestore.
+   Used on homepage and About page layouts. */
+
 export default function AboutSection() {
   const [content, setContent] = useState<any>(null);
 
+  /* ---------------- FETCH ABOUT CONTENT ---------------- */
+  /* Retrieves About section data from CMS */
   useEffect(() => {
     const fetchData = async () => {
       const ref = doc(db, "content", "about");
@@ -21,24 +27,25 @@ export default function AboutSection() {
     fetchData();
   }, []);
 
+  /* Prevent render until content loads */
   if (!content) return null;
 
   return (
     <section className="py-24 bg-gray-50 px-6">
       <div className="max-w-6xl mx-auto grid md:grid-cols-2 gap-12 items-center">
-        {/* IMAGE */}
+        {/* ---------------- IMAGE ---------------- */}
         {content.image && (
           <div className="relative h-[360px] w-full rounded-2xl overflow-hidden shadow-sm border border-gray-200">
             <Image
               src={content.image}
-              alt="About Aligned Minds Hypnotherapy"
+              alt="About Aligned Minds Hypnotherapy practice and approach"
               fill
               className="object-cover"
             />
           </div>
         )}
 
-        {/* TEXT */}
+        {/* ---------------- TEXT CONTENT ---------------- */}
         <div>
           <h2 className="text-3xl md:text-4xl font-bold mb-6 text-blue-900">
             {content.title}

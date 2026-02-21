@@ -17,11 +17,9 @@ import {
   updateDoc,
 } from "firebase/firestore";
 
-export const metadata = {
-  title: "Aligned Minds | Home",
-  description:
-    "Book hypnotherapy sessions designed to help you overcome stress, anxiety, and limiting beliefs.",
-};
+/* ---------------- BOOKING MODAL COMPONENT ---------------- */
+/* Handles appointment scheduling, availability lookup,
+   and booking persistence to Firestore. */
 
 interface Props {
   isOpen: boolean;
@@ -43,19 +41,21 @@ export default function BookingModal({ isOpen, onClose }: Props) {
   const [bookingId, setBookingId] = useState<string | null>(null);
   const [depositPaid, setDepositPaid] = useState(false);
 
-  //  Fetch availability
+  /* ---------------- FETCH AVAILABILITY ---------------- */
   useEffect(() => {
     const fetchAvailability = async () => {
       const ref = doc(db, "availability", "schedule");
       const snap = await getDoc(ref);
 
-      if (snap.exists()) setAvailability(snap.data());
+      if (snap.exists()) {
+        setAvailability(snap.data());
+      }
     };
 
     fetchAvailability();
   }, []);
 
-  //  Fetch booked slots
+  /* ---------------- FETCH BOOKED SLOTS ---------------- */
   useEffect(() => {
     if (!date) return;
 
@@ -68,7 +68,7 @@ export default function BookingModal({ isOpen, onClose }: Props) {
       );
 
       const snapshot = await getDocs(q);
-      const booked = snapshot.docs.map((doc) => doc.data().time);
+      const booked = snapshot.docs.map((docSnap) => docSnap.data().time);
 
       setBookedSlots(booked);
     };
@@ -84,7 +84,7 @@ export default function BookingModal({ isOpen, onClose }: Props) {
   const dayName = date ? getDayName(date) : "";
   const allSlots: string[] = availability[dayName] || [];
 
-  //  Confirm Booking
+  /* ---------------- CREATE BOOKING ---------------- */
   const handleBooking = async () => {
     if (!date || !time) {
       alert("Please select a date and time.");
@@ -110,7 +110,7 @@ export default function BookingModal({ isOpen, onClose }: Props) {
     alert("Appointment booked! You can now pay deposit.");
   };
 
-  //  Simulated Deposit
+  /* ---------------- SIMULATED DEPOSIT ---------------- */
   const simulateDeposit = async () => {
     if (!bookingId) return;
 
@@ -122,46 +122,19 @@ export default function BookingModal({ isOpen, onClose }: Props) {
       });
 
       setDepositPaid(true);
-
       alert("Deposit Paid Successfully!");
-
       onClose();
     }, 1500);
   };
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
-      {/* MODAL CARD */}
-      <div
-        className="
-          relative
-          bg-white
-          rounded-2xl
-          shadow-xl
-          w-full
-          max-w-md
-          max-h-[90vh]
-          overflow-y-auto
-          p-8
-          border border-gray-200
-        "
-      >
-        {/* CLOSE */}
+      <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto p-8 border border-gray-200">
+        {/* CLOSE BUTTON */}
         <button
           onClick={onClose}
-          className="
-            absolute
-            top-4
-            right-4
-            w-9 h-9
-            flex items-center justify-center
-            rounded-full
-            bg-gray-100
-            text-gray-600
-            hover:bg-blue-100
-            hover:text-blue-700
-            transition
-          "
+          aria-label="Close booking modal"
+          className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-blue-100 hover:text-blue-700 transition"
         >
           ✕
         </button>
@@ -175,14 +148,7 @@ export default function BookingModal({ isOpen, onClose }: Props) {
         <Calendar
           onChange={(value) => setDate(value as Date)}
           value={date}
-          className="
-            mx-auto
-            border
-            border-gray-200
-            rounded-xl
-            p-2
-            shadow-sm
-          "
+          className="mx-auto border border-gray-200 rounded-xl p-2 shadow-sm"
         />
 
         {/* TIME SLOTS */}
@@ -201,14 +167,13 @@ export default function BookingModal({ isOpen, onClose }: Props) {
                   disabled={isBooked}
                   onClick={() => setTime(slot)}
                   className={`p-2 rounded-lg border text-sm font-medium transition
-
-                  ${
-                    isBooked
-                      ? "bg-gray-200 text-gray-400 cursor-not-allowed border-gray-200"
-                      : time === slot
-                        ? "bg-blue-600 text-white border-blue-600"
-                        : "bg-gray-50 text-gray-900 border-gray-200 hover:bg-blue-50"
-                  }`}
+                    ${
+                      isBooked
+                        ? "bg-gray-200 text-gray-400 cursor-not-allowed border-gray-200"
+                        : time === slot
+                          ? "bg-blue-600 text-white border-blue-600"
+                          : "bg-gray-50 text-gray-900 border-gray-200 hover:bg-blue-50"
+                    }`}
                 >
                   {slot}
                 </button>
@@ -226,18 +191,7 @@ export default function BookingModal({ isOpen, onClose }: Props) {
           <select
             value={duration}
             onChange={(e) => setDuration(Number(e.target.value))}
-            className="
-              w-full
-              border
-              border-gray-200
-              bg-gray-50
-              p-3
-              rounded-lg
-              text-gray-900
-              focus:outline-none
-              focus:ring-2
-              focus:ring-blue-200
-            "
+            className="w-full border border-gray-300 bg-white p-3 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 transition"
           >
             <option value={30}>30 Minutes</option>
             <option value={60}>60 Minutes</option>
@@ -246,40 +200,20 @@ export default function BookingModal({ isOpen, onClose }: Props) {
           </select>
         </div>
 
-        {/* FORM */}
+        {/* CLIENT INFO */}
         <div className="mt-8 flex flex-col gap-3">
           <input
             placeholder="Your Name"
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className="
-              border
-              border-gray-200
-              bg-gray-50
-              p-3
-              rounded-lg
-              text-gray-900
-              focus:outline-none
-              focus:ring-2
-              focus:ring-blue-200
-            "
+            className="border border-gray-300 bg-white p-3 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 transition"
           />
 
           <input
             placeholder="Email Address"
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
-            className="
-              border
-              border-gray-200
-              bg-gray-50
-              p-3
-              rounded-lg
-              text-gray-900
-              focus:outline-none
-              focus:ring-2
-              focus:ring-blue-200
-            "
+            className="border border-gray-300 bg-white p-3 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 transition"
           />
         </div>
 
@@ -295,38 +229,16 @@ export default function BookingModal({ isOpen, onClose }: Props) {
         {/* BOOK BUTTON */}
         <button
           onClick={handleBooking}
-          className="
-            mt-8
-            w-full
-            bg-blue-600
-            text-white
-            py-3
-            rounded-lg
-            hover:bg-blue-700
-            transition
-            font-semibold
-            shadow
-          "
+          className="mt-8 w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold shadow"
         >
           Confirm Booking
         </button>
 
-        {/* DEPOSIT BUTTON */}
+        {/* DEPOSIT */}
         {bookingId && !depositPaid && (
           <button
             onClick={simulateDeposit}
-            className="
-              mt-3
-              w-full
-              bg-green-600
-              text-white
-              py-3
-              rounded-lg
-              hover:bg-green-700
-              transition
-              font-semibold
-              shadow
-            "
+            className="mt-3 w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition font-semibold shadow"
           >
             Pay Deposit ($50)
           </button>

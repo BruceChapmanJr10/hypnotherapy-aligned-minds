@@ -7,25 +7,26 @@ import { Service } from "../types/service";
 import ServiceCard from "./ServiceCard";
 import ServiceModal from "./ServiceModal";
 
-export const metadata = {
-  title: "Aligned Minds | Home",
-  description:
-    "Book hypnotherapy sessions designed to help you overcome stress, anxiety, and limiting beliefs.",
-};
+/* ---------------- SERVICES SECTION COMPONENT ---------------- */
+/* Displays active services pulled from CMS.
+   Used on homepage and services page layouts. */
 
 export default function ServicesSection() {
   const [services, setServices] = useState<Service[]>([]);
   const [selectedService, setSelectedService] = useState<Service | null>(null);
 
+  /* ---------------- FETCH SERVICES ---------------- */
+  /* Retrieves services from Firestore CMS */
   useEffect(() => {
     const fetchServices = async () => {
       const snapshot = await getDocs(collection(db, "services"));
 
-      const data: Service[] = snapshot.docs.map((doc) => ({
-        id: doc.id,
-        ...(doc.data() as Omit<Service, "id">),
+      const data: Service[] = snapshot.docs.map((docSnap) => ({
+        id: docSnap.id,
+        ...(docSnap.data() as Omit<Service, "id">),
       }));
 
+      /* Only display active services */
       setServices(data.filter((s) => s.active));
     };
 
@@ -42,10 +43,12 @@ export default function ServicesSection() {
         to-white
       "
       id="services"
+      aria-labelledby="services-heading"
     >
       <div className="max-w-6xl mx-auto text-center">
-        {/* TITLE */}
+        {/* ---------------- TITLE ---------------- */}
         <h2
+          id="services-heading"
           className="
             text-3xl
             md:text-4xl
@@ -57,7 +60,7 @@ export default function ServicesSection() {
           Our Services
         </h2>
 
-        {/* SUBTEXT */}
+        {/* ---------------- SUBTEXT ---------------- */}
         <p
           className="
             text-gray-600
@@ -71,7 +74,7 @@ export default function ServicesSection() {
           clarity, and lasting change.
         </p>
 
-        {/* GRID */}
+        {/* ---------------- SERVICES GRID ---------------- */}
         <div
           className="
             grid
@@ -90,7 +93,7 @@ export default function ServicesSection() {
         </div>
       </div>
 
-      {/* MODAL */}
+      {/* ---------------- SERVICE MODAL ---------------- */}
       <ServiceModal
         service={selectedService}
         onClose={() => setSelectedService(null)}

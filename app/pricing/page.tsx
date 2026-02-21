@@ -5,6 +5,8 @@ import { db } from "@/lib/firebase";
 import { collection, getDocs } from "firebase/firestore";
 import BookingModal from "@/components/BookingModal";
 
+/* ---------------- SERVICE TYPE ---------------- */
+/* Represents bookable hypnotherapy services */
 interface Service {
   id: string;
   title: string;
@@ -14,20 +16,21 @@ interface Service {
   active: boolean;
 }
 
-export default function PricingPage() {
+export default function PricingClient() {
   const [services, setServices] = useState<Service[]>([]);
   const [openBooking, setOpenBooking] = useState(false);
 
-  //  Fetch services
+  /* ---------------- FETCH SERVICES ---------------- */
+  /* Retrieves active services for pricing display */
   useEffect(() => {
     const fetchServices = async () => {
       const snapshot = await getDocs(collection(db, "services"));
 
-      const data: Service[] = snapshot.docs.map((doc) => {
-        const serviceData = doc.data();
+      const data: Service[] = snapshot.docs.map((docSnap) => {
+        const serviceData = docSnap.data();
 
         return {
-          id: doc.id,
+          id: docSnap.id,
           title: serviceData.title || "",
           description: serviceData.description || "",
           price: serviceData.price || "",
@@ -36,6 +39,7 @@ export default function PricingPage() {
         };
       });
 
+      /* Only show active services */
       setServices(data.filter((s) => s.active));
     };
 
@@ -44,20 +48,11 @@ export default function PricingPage() {
 
   return (
     <>
-      <main
-        className="
-          min-h-screen
-          py-24
-          px-6
-          bg-gradient-to-b
-          from-blue-50
-          to-white
-        "
-      >
+      <main className="min-h-screen py-24 px-6 bg-gradient-to-b from-blue-50 to-white">
         <div className="max-w-6xl mx-auto text-center">
-          {/* TITLE */}
+          {/* PAGE TITLE */}
           <h1 className="text-4xl md:text-5xl font-bold text-blue-900 mb-6">
-            Session Pricing
+            Hypnotherapy Session Pricing
           </h1>
 
           <p className="text-gray-600 mb-16 max-w-2xl mx-auto">
@@ -69,45 +64,23 @@ export default function PricingPage() {
             {services.map((service) => (
               <div
                 key={service.id}
-                className="
-                  bg-white
-                  rounded-2xl
-                  shadow-md
-                  border border-gray-200
-                  p-8
-                  flex flex-col
-                  justify-between
-                  hover:shadow-xl
-                  transition
-                "
+                className="bg-white rounded-2xl shadow-md border border-gray-200 p-8 flex flex-col justify-between hover:shadow-xl transition"
               >
-                {/* TITLE */}
                 <h2 className="text-xl font-bold text-blue-900 mb-3">
                   {service.title}
                 </h2>
 
-                {/* DESCRIPTION */}
                 <p className="text-gray-600 text-sm mb-6">
                   {service.description}
                 </p>
 
-                {/* PRICE */}
                 <div className="text-3xl font-bold text-blue-600 mb-6">
                   {service.price}
                 </div>
 
-                {/* BOOK BUTTON */}
                 <button
                   onClick={() => setOpenBooking(true)}
-                  className="
-                    bg-blue-600
-                    text-white
-                    py-3
-                    rounded-lg
-                    hover:bg-blue-700
-                    transition
-                    font-semibold
-                  "
+                  className="bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold"
                 >
                   Book Session
                 </button>

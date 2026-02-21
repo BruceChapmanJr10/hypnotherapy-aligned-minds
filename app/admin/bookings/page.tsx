@@ -11,6 +11,8 @@ import {
   query,
 } from "firebase/firestore";
 
+/* ---------------- BOOKING TYPE ---------------- */
+/* Represents a scheduled client session */
 interface Booking {
   id: string;
   name: string;
@@ -27,7 +29,8 @@ export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
 
-  //  Fetch bookings
+  /* ---------------- FETCH BOOKINGS ---------------- */
+  /* Retrieves bookings ordered by newest first */
   const fetchBookings = async () => {
     const q = query(collection(db, "bookings"), orderBy("createdAt", "desc"));
 
@@ -57,7 +60,8 @@ export default function AdminBookingsPage() {
     fetchBookings();
   }, []);
 
-  //  Delete booking
+  /* ---------------- DELETE BOOKING ---------------- */
+  /* Permanently removes a booking record */
   const handleDelete = async (id: string) => {
     if (!confirm("Cancel this booking?")) return;
 
@@ -79,7 +83,7 @@ export default function AdminBookingsPage() {
         <p className="text-gray-400">No bookings yet.</p>
       )}
 
-      {/* ---------------- MOBILE CARDS ---------------- */}
+      {/* ---------------- MOBILE VIEW ---------------- */}
       <div className="md:hidden space-y-6">
         {bookings.map((booking) => (
           <div

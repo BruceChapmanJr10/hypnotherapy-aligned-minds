@@ -4,6 +4,10 @@ import { useEffect, useState } from "react";
 import { db } from "@/lib/firebase";
 import { collection, addDoc, Timestamp, doc, getDoc } from "firebase/firestore";
 
+/* ---------------- FOOTER COMPONENT ---------------- */
+/* Displays CMS-managed business info and
+   includes a lightweight contact form. */
+
 export default function Footer() {
   const [form, setForm] = useState({
     name: "",
@@ -15,7 +19,8 @@ export default function Footer() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
 
-  // Fetch footer CMS content
+  /* ---------------- FETCH FOOTER CONTENT ---------------- */
+  /* Retrieves business contact information from CMS */
   useEffect(() => {
     const fetchFooter = async () => {
       const ref = doc(db, "content", "footer");
@@ -29,7 +34,7 @@ export default function Footer() {
     fetchFooter();
   }, []);
 
-  // Handle form input
+  /* ---------------- INPUT HANDLER ---------------- */
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
   ) => {
@@ -39,29 +44,34 @@ export default function Footer() {
     });
   };
 
-  // Submit contact form
+  /* ---------------- SUBMIT CONTACT FORM ---------------- */
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    await addDoc(collection(db, "contactMessages"), {
-      ...form,
-      createdAt: Timestamp.now(),
-    });
+    try {
+      await addDoc(collection(db, "contactMessages"), {
+        ...form,
+        createdAt: Timestamp.now(),
+      });
 
-    setForm({ name: "", email: "", message: "" });
+      setForm({ name: "", email: "", message: "" });
+      setSuccess(true);
+
+      setTimeout(() => setSuccess(false), 4000);
+    } catch (error) {
+      console.error("Footer form error:", error);
+    }
+
     setLoading(false);
-    setSuccess(true);
-
-    setTimeout(() => setSuccess(false), 4000);
   };
 
   if (!content) return null;
 
   return (
-    <footer className="bg-gray-100 border-t border-gray-200">
+    <footer className="bg-gray-100 border-t border-gray-200" role="contentinfo">
       <div className="max-w-7xl mx-auto px-6 py-16 grid md:grid-cols-2 gap-12">
-        {/* LEFT — CMS CONTACT INFO */}
+        {/* ---------------- BUSINESS INFO ---------------- */}
         <div className="flex flex-col gap-4 text-gray-800">
           <h2 className="text-2xl font-bold text-blue-900">
             {content.businessName}
@@ -69,11 +79,12 @@ export default function Footer() {
 
           <p className="text-gray-600">{content.description}</p>
 
-          <div className="mt-6 flex flex-col gap-2 text-gray-700">
+          {/* NAP (Name, Address, Phone) consistency for local SEO */}
+          <address className="not-italic mt-6 flex flex-col gap-2 text-gray-700">
             <p>📍 {content.address}</p>
             <p>📞 {content.phone}</p>
             <p>✉️ {content.email}</p>
-          </div>
+          </address>
 
           <p className="text-sm text-gray-500 mt-8">
             © {new Date().getFullYear()} {content.businessName}. All rights
@@ -81,7 +92,7 @@ export default function Footer() {
           </p>
         </div>
 
-        {/* RIGHT — CONTACT FORM */}
+        {/* ---------------- CONTACT FORM ---------------- */}
         <div>
           <h2 className="text-2xl font-bold mb-6 text-blue-900">Contact Us</h2>
 
@@ -92,7 +103,8 @@ export default function Footer() {
               value={form.name}
               onChange={handleChange}
               required
-              className="bg-white border border-gray-300 p-3 rounded placeholder-gray-500 text-gray-900"
+              aria-label="Full Name"
+              className="bg-white border border-gray-300 p-3 rounded text-gray-900"
             />
 
             <input
@@ -102,17 +114,19 @@ export default function Footer() {
               value={form.email}
               onChange={handleChange}
               required
-              className="bg-white border border-gray-300 p-3 rounded placeholder-gray-500 text-gray-900"
+              aria-label="Email Address"
+              className="bg-white border border-gray-300 p-3 rounded text-gray-900"
             />
 
             <textarea
               name="message"
-              placeholder="How can we help you\?"
+              placeholder="How can we help you?"
               value={form.message}
               onChange={handleChange}
               rows={4}
               required
-              className="bg-white border border-gray-300 p-3 rounded placeholder-gray-500 text-gray-900"
+              aria-label="Message"
+              className="bg-white border border-gray-300 p-3 rounded text-gray-900"
             />
 
             <button
