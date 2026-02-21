@@ -165,9 +165,7 @@ export default function AdminSEOPage() {
 
           {/* HOMEPAGE */}
           <div className="mb-10">
-            <p className="text-sm text-gray-500 mb-1">
-              alignedmindshypnotherapy.com
-            </p>
+            <p className="text-sm text-gray-500 mb-1">alignedminds.com</p>
 
             <p className="text-blue-700 text-lg font-medium leading-snug">
               {form.homeTitle || "Homepage Title Preview"}
@@ -181,9 +179,7 @@ export default function AdminSEOPage() {
 
           {/* BLOG */}
           <div>
-            <p className="text-sm text-gray-500 mb-1">
-              alignedmindshypnotherapy.com/blog
-            </p>
+            <p className="text-sm text-gray-500 mb-1">alingedminds.com/blog</p>
 
             <p className="text-blue-700 text-lg font-medium leading-snug">
               {form.blogTitle || "Blog Title Preview"}

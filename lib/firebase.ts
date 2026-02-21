@@ -18,7 +18,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Optional: Analytics (can remove if you don’t need)
+// Optional: Analytics
 const analytics = typeof window !== "undefined" ? getAnalytics(app) : null;
 
 // Export Auth & Firestore

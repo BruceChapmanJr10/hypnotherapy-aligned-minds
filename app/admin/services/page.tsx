@@ -47,7 +47,7 @@ export default function AdminServicesPage() {
   const fetchServices = async () => {
     const snapshot = await getDocs(collection(db, "services"));
 
-    // 🔥 Normalize old docs so fields are never undefined
+    //  Normalize old docs so fields are never undefined
     const data = snapshot.docs.map((docSnap) => {
       const service = docSnap.data() as Partial<Service>;
 
@@ -132,7 +132,7 @@ export default function AdminServicesPage() {
   /* ================= EDIT ================= */
 
   const handleEdit = (service: Service) => {
-    // 🔥 Prevent undefined fields
+    //  Prevent undefined fields
     setForm({
       id: service.id,
       title: service.title || "",

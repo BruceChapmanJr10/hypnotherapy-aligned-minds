@@ -27,7 +27,7 @@ export default function AdminBookingsPage() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // 🔹 Fetch bookings
+  //  Fetch bookings
   const fetchBookings = async () => {
     const q = query(collection(db, "bookings"), orderBy("createdAt", "desc"));
 
@@ -57,7 +57,7 @@ export default function AdminBookingsPage() {
     fetchBookings();
   }, []);
 
-  // 🔹 Delete booking
+  //  Delete booking
   const handleDelete = async (id: string) => {
     if (!confirm("Cancel this booking?")) return;
 

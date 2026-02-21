@@ -84,7 +84,7 @@ export default function BookingModal({ isOpen, onClose }: Props) {
   const dayName = date ? getDayName(date) : "";
   const allSlots: string[] = availability[dayName] || [];
 
-  // 🔹 Confirm Booking
+  //  Confirm Booking
   const handleBooking = async () => {
     if (!date || !time) {
       alert("Please select a date and time.");
@@ -110,7 +110,7 @@ export default function BookingModal({ isOpen, onClose }: Props) {
     alert("Appointment booked! You can now pay deposit.");
   };
 
-  // 🔹 Simulated Deposit
+  //  Simulated Deposit
   const simulateDeposit = async () => {
     if (!bookingId) return;
 
