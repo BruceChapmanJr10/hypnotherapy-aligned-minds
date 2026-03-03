@@ -3,7 +3,8 @@ import { NextResponse } from "next/server";
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+/* ---------------- CREATE CHECKOUT SESSION ---------------- */
+/* Creates Stripe session using Firestore service pricing */
 
 export async function POST(req: Request) {
   try {
@@ -13,7 +14,21 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing data" }, { status: 400 });
     }
 
-    //  Get service from Firestore
+    /* ---------------- ENV CHECK ---------------- */
+    if (!process.env.STRIPE_SECRET_KEY) {
+      console.error("Missing STRIPE_SECRET_KEY");
+      return NextResponse.json(
+        { error: "Stripe not configured" },
+        { status: 500 },
+      );
+    }
+
+    /* ---------------- INIT STRIPE SAFELY ---------------- */
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: "2024-06-20",
+    });
+
+    /* ---------------- FETCH SERVICE ---------------- */
     const serviceRef = doc(db, "services", serviceId);
     const serviceSnap = await getDoc(serviceRef);
 
@@ -23,9 +38,11 @@ export async function POST(req: Request) {
 
     const service = serviceSnap.data();
 
-    // Convert price string like "$120" to cents
-    const amount = Number(service.price.replace(/[^0-9.]/g, "")) * 100;
+    /* Convert "$120" → 12000 cents */
+    const amount =
+      Math.round(parseFloat(service.price.replace(/[^0-9.]/g, ""))) * 100;
 
+    /* ---------------- CREATE SESSION ---------------- */
     const session = await stripe.checkout.sessions.create({
       mode: "payment",
       payment_method_types: ["card"],
@@ -45,6 +62,7 @@ export async function POST(req: Request) {
       cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/pricing`,
       metadata: {
         bookingId,
+        serviceId,
       },
     });
 
