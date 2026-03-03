@@ -2,11 +2,17 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import BookingModal from "@/components/BookingModal";
+import { useRouter } from "next/navigation";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const [openBooking, setOpenBooking] = useState(false);
+  const router = useRouter();
+
+  /* ---------------- HANDLE BOOK CLICK ---------------- */
+  /* Redirects users to pricing page to select service */
+  const handleBookClick = () => {
+    router.push("/pricing");
+  };
 
   return (
     <>
@@ -57,29 +63,29 @@ export default function Navbar() {
             text-gray-700
           "
           >
-            <Link href="/" className="hover:text-blue-700 transition">
+            <Link href="/" className="hover:text-blue-700">
               Home
             </Link>
 
-            <Link href="/#services" className="hover:text-blue-700 transition">
+            <Link href="/#services" className="hover:text-blue-700">
               Services
             </Link>
 
-            <Link href="/blog" className="hover:text-blue-700 transition">
+            <Link href="/blog" className="hover:text-blue-700">
               Blog
             </Link>
 
-            <Link href="/pricing" className="hover:text-blue-700 transition">
+            <Link href="/pricing" className="hover:text-blue-700">
               Pricing
             </Link>
 
-            <Link href="/contact" className="hover:text-blue-700 transition">
+            <Link href="/contact" className="hover:text-blue-700">
               Contact
             </Link>
 
             {/* BOOK BUTTON */}
             <button
-              onClick={() => setOpenBooking(true)}
+              onClick={handleBookClick}
               className="
                 bg-blue-600
                 text-white
@@ -87,7 +93,6 @@ export default function Navbar() {
                 py-2
                 rounded-lg
                 hover:bg-blue-700
-                transition
                 shadow-sm
               "
             >
@@ -132,7 +137,7 @@ export default function Navbar() {
 
             <button
               onClick={() => {
-                setOpenBooking(true);
+                handleBookClick();
                 setOpen(false);
               }}
               className="
@@ -143,7 +148,6 @@ export default function Navbar() {
                 rounded-lg
                 text-center
                 hover:bg-blue-700
-                transition
               "
             >
               Book Appointment
@@ -151,12 +155,6 @@ export default function Navbar() {
           </div>
         )}
       </header>
-
-      {/* BOOKING MODAL */}
-      <BookingModal
-        isOpen={openBooking}
-        onClose={() => setOpenBooking(false)}
-      />
     </>
   );
 }

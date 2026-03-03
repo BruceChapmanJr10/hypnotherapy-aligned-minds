@@ -19,32 +19,49 @@ interface Service {
 export default function PricingClient() {
   const [services, setServices] = useState<Service[]>([]);
   const [openBooking, setOpenBooking] = useState(false);
+  const [selectedServiceId, setSelectedServiceId] = useState<string | null>(
+    null,
+  );
+  const [loading, setLoading] = useState(true);
 
   /* ---------------- FETCH SERVICES ---------------- */
   /* Retrieves active services for pricing display */
   useEffect(() => {
     const fetchServices = async () => {
-      const snapshot = await getDocs(collection(db, "services"));
+      try {
+        const snapshot = await getDocs(collection(db, "services"));
 
-      const data: Service[] = snapshot.docs.map((docSnap) => {
-        const serviceData = docSnap.data();
+        const data: Service[] = snapshot.docs.map((docSnap) => {
+          const serviceData = docSnap.data();
 
-        return {
-          id: docSnap.id,
-          title: serviceData.title || "",
-          description: serviceData.description || "",
-          price: serviceData.price || "",
-          image: serviceData.image || "",
-          active: serviceData.active ?? true,
-        };
-      });
+          return {
+            id: docSnap.id,
+            title: serviceData.title || "",
+            description: serviceData.description || "",
+            price: serviceData.price || "",
+            image: serviceData.image || "",
+            active: serviceData.active ?? true,
+          };
+        });
 
-      /* Only show active services */
-      setServices(data.filter((s) => s.active));
+        /* Only show active services */
+        setServices(data.filter((s) => s.active));
+      } catch (error) {
+        console.error("Error fetching services:", error);
+      } finally {
+        setLoading(false);
+      }
     };
 
     fetchServices();
   }, []);
+
+  /* ---------------- OPEN BOOKING ---------------- */
+  /* Stores selected service before opening modal */
+  const handleOpenBooking = (serviceId: string) => {
+    setSelectedServiceId(serviceId);
+    setOpenBooking(true);
+  };
 
   return (
     <>
@@ -59,42 +76,60 @@ export default function PricingClient() {
             Choose the session that best supports your transformation journey.
           </p>
 
+          {/* LOADING STATE */}
+          {loading && <p className="text-gray-500">Loading services...</p>}
+
           {/* PRICING CARDS */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {services.map((service) => (
-              <div
-                key={service.id}
-                className="bg-white rounded-2xl shadow-md border border-gray-200 p-8 flex flex-col justify-between hover:shadow-xl transition"
-              >
-                <h2 className="text-xl font-bold text-blue-900 mb-3">
-                  {service.title}
-                </h2>
-
-                <p className="text-gray-600 text-sm mb-6">
-                  {service.description}
-                </p>
-
-                <div className="text-3xl font-bold text-blue-600 mb-6">
-                  {service.price}
-                </div>
-
-                <button
-                  onClick={() => setOpenBooking(true)}
-                  className="bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold"
+          {!loading && services.length > 0 && (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-10">
+              {services.map((service) => (
+                <div
+                  key={service.id}
+                  className="bg-white rounded-2xl shadow-md border border-gray-200 p-8 flex flex-col justify-between"
                 >
-                  Book Session
-                </button>
-              </div>
-            ))}
-          </div>
+                  <h2 className="text-xl font-bold text-blue-900 mb-3">
+                    {service.title}
+                  </h2>
+
+                  <p className="text-gray-600 text-sm mb-6">
+                    {service.description}
+                  </p>
+
+                  <div className="text-3xl font-bold text-blue-600 mb-6">
+                    {service.price}
+                  </div>
+
+                  <button
+                    onClick={() => handleOpenBooking(service.id)}
+                    className="bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 font-semibold"
+                  >
+                    Book Session
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* EMPTY STATE */}
+          {!loading && services.length === 0 && (
+            <p className="text-gray-500">
+              No services available at the moment.
+            </p>
+          )}
         </div>
       </main>
 
-      {/* BOOKING MODAL */}
-      <BookingModal
-        isOpen={openBooking}
-        onClose={() => setOpenBooking(false)}
-      />
+      {/* ---------------- BOOKING MODAL ---------------- */}
+      {selectedServiceId && (
+        <BookingModal
+          isOpen={openBooking}
+          onClose={() => {
+            setOpenBooking(false);
+            setSelectedServiceId(null);
+          }}
+          serviceId={selectedServiceId}
+        />
+      )}
     </>
   );
 }

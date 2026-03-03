@@ -1,0 +1,59 @@
+import Stripe from "stripe";
+import { NextResponse } from "next/server";
+import { db } from "@/lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
+
+export async function POST(req: Request) {
+  try {
+    const { bookingId, serviceId } = await req.json();
+
+    if (!bookingId || !serviceId) {
+      return NextResponse.json({ error: "Missing data" }, { status: 400 });
+    }
+
+    //  Get service from Firestore
+    const serviceRef = doc(db, "services", serviceId);
+    const serviceSnap = await getDoc(serviceRef);
+
+    if (!serviceSnap.exists()) {
+      return NextResponse.json({ error: "Service not found" }, { status: 404 });
+    }
+
+    const service = serviceSnap.data();
+
+    // Convert price string like "$120" to cents
+    const amount = Number(service.price.replace(/[^0-9.]/g, "")) * 100;
+
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      payment_method_types: ["card"],
+      line_items: [
+        {
+          price_data: {
+            currency: "usd",
+            product_data: {
+              name: service.title,
+            },
+            unit_amount: amount,
+          },
+          quantity: 1,
+        },
+      ],
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL}/success?bookingId=${bookingId}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL}/pricing`,
+      metadata: {
+        bookingId,
+      },
+    });
+
+    return NextResponse.json({ url: session.url });
+  } catch (error) {
+    console.error("Stripe error:", error);
+    return NextResponse.json(
+      { error: "Internal Server Error" },
+      { status: 500 },
+    );
+  }
+}

@@ -14,19 +14,19 @@ import {
   query,
   where,
   getDocs,
-  updateDoc,
 } from "firebase/firestore";
 
 /* ---------------- BOOKING MODAL COMPONENT ---------------- */
 /* Handles appointment scheduling, availability lookup,
-   and booking persistence to Firestore. */
+   Firestore booking creation, and Stripe redirect */
 
 interface Props {
   isOpen: boolean;
   onClose: () => void;
+  serviceId: string;
 }
 
-export default function BookingModal({ isOpen, onClose }: Props) {
+export default function BookingModal({ isOpen, onClose, serviceId }: Props) {
   const [availability, setAvailability] = useState<any>({});
   const [date, setDate] = useState<Date | null>(new Date());
   const [time, setTime] = useState<string | null>(null);
@@ -38,8 +38,7 @@ export default function BookingModal({ isOpen, onClose }: Props) {
     email: "",
   });
 
-  const [bookingId, setBookingId] = useState<string | null>(null);
-  const [depositPaid, setDepositPaid] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   /* ---------------- FETCH AVAILABILITY ---------------- */
   useEffect(() => {
@@ -84,7 +83,7 @@ export default function BookingModal({ isOpen, onClose }: Props) {
   const dayName = date ? getDayName(date) : "";
   const allSlots: string[] = availability[dayName] || [];
 
-  /* ---------------- CREATE BOOKING ---------------- */
+  /* ---------------- CREATE BOOKING + STRIPE ---------------- */
   const handleBooking = async () => {
     if (!date || !time) {
       alert("Please select a date and time.");
@@ -96,50 +95,63 @@ export default function BookingModal({ isOpen, onClose }: Props) {
       return;
     }
 
-    const docRef = await addDoc(collection(db, "bookings"), {
-      name: form.name,
-      email: form.email,
-      date: date.toISOString().split("T")[0],
-      time,
-      duration,
-      depositPaid: false,
-      createdAt: Timestamp.now(),
-    });
+    try {
+      setLoading(true);
 
-    setBookingId(docRef.id);
-    alert("Appointment booked! You can now pay deposit.");
-  };
-
-  /* ---------------- SIMULATED DEPOSIT ---------------- */
-  const simulateDeposit = async () => {
-    if (!bookingId) return;
-
-    alert("Redirecting to secure payment...");
-
-    setTimeout(async () => {
-      await updateDoc(doc(db, "bookings", bookingId), {
-        depositPaid: true,
+      //  Create Firestore booking first
+      const docRef = await addDoc(collection(db, "bookings"), {
+        name: form.name,
+        email: form.email,
+        date: date.toISOString().split("T")[0],
+        time,
+        duration,
+        depositPaid: false,
+        createdAt: Timestamp.now(),
       });
 
-      setDepositPaid(true);
-      alert("Deposit Paid Successfully!");
-      onClose();
-    }, 1500);
+      //  Create Stripe checkout session
+      const response = await fetch("/api/create-checkout-session", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bookingId: docRef.id,
+          serviceId: serviceId,
+        }),
+      });
+
+      if (!response.ok) {
+        const text = await response.text();
+        console.error("Stripe error response:", text);
+        alert("Payment initialization failed.");
+        return;
+      }
+
+      const data = await response.json();
+
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        alert("Failed to redirect to payment.");
+      }
+    } catch (error) {
+      console.error(error);
+      alert("Something went wrong. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="fixed inset-0 bg-black/40 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div className="relative bg-white rounded-2xl shadow-xl w-full max-w-md max-h-[90vh] overflow-y-auto p-8 border border-gray-200">
-        {/* CLOSE BUTTON */}
+        {/* CLOSE */}
         <button
           onClick={onClose}
-          aria-label="Close booking modal"
           className="absolute top-4 right-4 w-9 h-9 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-blue-100 hover:text-blue-700 transition"
         >
           ✕
         </button>
 
-        {/* TITLE */}
         <h2 className="text-2xl font-bold mb-6 text-center text-blue-900">
           Book Appointment
         </h2>
@@ -167,13 +179,13 @@ export default function BookingModal({ isOpen, onClose }: Props) {
                   disabled={isBooked}
                   onClick={() => setTime(slot)}
                   className={`p-2 rounded-lg border text-sm font-medium transition
-                    ${
-                      isBooked
-                        ? "bg-gray-200 text-gray-400 cursor-not-allowed border-gray-200"
-                        : time === slot
-                          ? "bg-blue-600 text-white border-blue-600"
-                          : "bg-gray-50 text-gray-900 border-gray-200 hover:bg-blue-50"
-                    }`}
+                  ${
+                    isBooked
+                      ? "bg-gray-200 text-gray-400 cursor-not-allowed border-gray-200"
+                      : time === slot
+                        ? "bg-blue-600 text-white border-blue-600"
+                        : "bg-gray-50 text-gray-900 border-gray-200 hover:bg-blue-50"
+                  }`}
                 >
                   {slot}
                 </button>
@@ -191,7 +203,7 @@ export default function BookingModal({ isOpen, onClose }: Props) {
           <select
             value={duration}
             onChange={(e) => setDuration(Number(e.target.value))}
-            className="w-full border border-gray-300 bg-white p-3 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 transition"
+            className="w-full border border-gray-300 bg-white p-3 rounded-lg text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-300"
           >
             <option value={30}>30 Minutes</option>
             <option value={60}>60 Minutes</option>
@@ -206,14 +218,14 @@ export default function BookingModal({ isOpen, onClose }: Props) {
             placeholder="Your Name"
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
-            className="border border-gray-300 bg-white p-3 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 transition"
+            className="border border-gray-300 bg-white p-3 rounded-lg text-gray-900 placeholder-gray-500"
           />
 
           <input
             placeholder="Email Address"
             value={form.email}
             onChange={(e) => setForm({ ...form, email: e.target.value })}
-            className="border border-gray-300 bg-white p-3 rounded-lg text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-300 focus:border-blue-400 transition"
+            className="border border-gray-300 bg-white p-3 rounded-lg text-gray-900 placeholder-gray-500"
           />
         </div>
 
@@ -229,20 +241,11 @@ export default function BookingModal({ isOpen, onClose }: Props) {
         {/* BOOK BUTTON */}
         <button
           onClick={handleBooking}
-          className="mt-8 w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold shadow"
+          disabled={loading}
+          className="mt-8 w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition font-semibold shadow disabled:opacity-50"
         >
-          Confirm Booking
+          {loading ? "Processing..." : "Confirm & Pay Deposit"}
         </button>
-
-        {/* DEPOSIT */}
-        {bookingId && !depositPaid && (
-          <button
-            onClick={simulateDeposit}
-            className="mt-3 w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700 transition font-semibold shadow"
-          >
-            Pay Deposit ($50)
-          </button>
-        )}
       </div>
     </div>
   );

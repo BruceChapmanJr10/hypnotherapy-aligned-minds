@@ -2,8 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useState, useEffect } from "react";
-import BookingModal from "@/components/BookingModal";
+import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { db } from "@/lib/firebase";
 import { doc, getDoc } from "firebase/firestore";
 import { Sofia } from "next/font/google";
@@ -16,10 +16,11 @@ const sofia = Sofia({
 });
 
 /* ---------------- HERO SECTION COMPONENT ---------------- */
-/* Displays homepage hero content pulled from CMS */
+/* Displays homepage hero content pulled from CMS.
+   Booking now redirects to pricing page instead of opening modal. */
 
 export default function HeroSection() {
-  const [openBooking, setOpenBooking] = useState(false);
+  const router = useRouter();
   const [content, setContent] = useState<any>(null);
 
   /* ---------------- FETCH HERO CONTENT ---------------- */
@@ -39,6 +40,12 @@ export default function HeroSection() {
 
   /* Prevent render until CMS content loads */
   if (!content) return null;
+
+  /* ---------------- HANDLE BOOK CLICK ---------------- */
+  /* Redirects user to pricing page to select a service */
+  const handleBookClick = () => {
+    router.push("/pricing");
+  };
 
   return (
     <section className="py-24 px-6 text-center bg-gradient-to-b from-blue-50 to-white">
@@ -68,15 +75,15 @@ export default function HeroSection() {
       <div className="flex justify-center gap-6 mb-14 flex-wrap">
         {/* PRIMARY CTA */}
         <button
-          onClick={() => setOpenBooking(true)}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold transition shadow-md"
+          onClick={handleBookClick}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-semibold shadow-md"
         >
           Book Appointment
         </button>
 
         {/* SECONDARY CTA */}
         <Link href="/contact">
-          <button className="border border-blue-600 text-blue-700 hover:bg-blue-50 px-8 py-3 rounded-lg font-semibold transition">
+          <button className="border border-blue-600 text-blue-700 hover:bg-blue-50 px-8 py-3 rounded-lg font-semibold">
             Contact Us
           </button>
         </Link>
@@ -96,12 +103,6 @@ export default function HeroSection() {
           </div>
         </div>
       )}
-
-      {/* ---------------- BOOKING MODAL ---------------- */}
-      <BookingModal
-        isOpen={openBooking}
-        onClose={() => setOpenBooking(false)}
-      />
     </section>
   );
 }
