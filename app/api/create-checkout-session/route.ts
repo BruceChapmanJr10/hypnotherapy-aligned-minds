@@ -24,9 +24,7 @@ export async function POST(req: Request) {
     }
 
     /* ---------------- INIT STRIPE SAFELY ---------------- */
-    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: "2024-06-20",
-    });
+    const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string);
 
     /* ---------------- FETCH SERVICE ---------------- */
     const serviceRef = doc(db, "services", serviceId);
